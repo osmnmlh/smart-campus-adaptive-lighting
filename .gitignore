@@ -1,0 +1,43 @@
+# Arduino build outputs
+build/
+*.bin
+*.elf
+*.hex
+*.map
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# VS Code local settings
+.vscode/
+!.vscode/extensions.json
+
+# Arduino local/user files
+*.autosave
+
+# Local configurations and secrets
+config.h
+secrets.h
+credentials.h
+wifi_credentials.h
+
+# Dashboard dependencies
+node_modules/
+.env
+.env.local
+dist/
+.next/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Large/raw video files
+media/demo-video/raw/
