@@ -108,6 +108,10 @@ NestJS Backend
 
 Planlama ve frontend geliştirme aşamasında fiziksel ESP32 cihazlarının yerine mock veri servisi kullanılacaktır.
 
+İlk UI MVP deterministic mock data ile çalışacaktır. Gerçek ESP32 bağlantısı, production MQTT
+ingestion ve PostgreSQL persistence bu aşamanın kapsamı dışındadır; bunlar için yalnızca ileride
+değiştirilebilir interface ve adapter sınırları korunacaktır.
+
 ```text
 Mock Scenario Service
           │
@@ -525,19 +529,19 @@ Normal çalışma modudur.
 * Node’lar haberleşir.
 * Adaptif parlaklık kontrolü uygulanır.
 
-### SCHEDULED_MODE
+### SCHEDULED
 
 Işıklar belirlenen zaman çizelgesine göre çalıştırılır.
 
-### MANUAL_OVERRIDE
+### MANUAL
 
 Kullanıcı otomatik sistemi geçici olarak devre dışı bırakarak lambaları manuel kontrol eder.
 
-### MAINTENANCE_MODE
+### MAINTENANCE
 
 Sensör, node, MOSFET ve lambaların bakım veya test işlemleri için kullanılır.
 
-### FAIL_SAFE_MODE
+### FAIL_SAFE
 
 Sistem güvenli karar veremediğinde aydınlatmayı güvenli seviyeye getirir.
 
@@ -709,63 +713,26 @@ Node
 ## 13. Planlanan Proje Yapısı
 
 ```text
-smart-campus-lighting-dashboard/
+dashboard/
 │
-├── apps/
-│   ├── web/
-│   │   ├── app/
-│   │   ├── components/
-│   │   ├── features/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── stores/
-│   │   └── types/
-│   │
-│   ├── api/
-│   │   ├── src/
-│   │   │   ├── modules/
-│   │   │   │   ├── nodes/
-│   │   │   │   ├── lamps/
-│   │   │   │   ├── telemetry/
-│   │   │   │   ├── faults/
-│   │   │   │   ├── communication/
-│   │   │   │   ├── schedules/
-│   │   │   │   ├── commands/
-│   │   │   │   └── auth/
-│   │   │   ├── gateways/
-│   │   │   ├── mqtt/
-│   │   │   └── common/
-│   │   └── test/
-│   │
-│   └── simulator/
-│       ├── scenarios/
-│       ├── publishers/
-│       └── fixtures/
-│
+├── frontend/
+├── backend/
 ├── packages/
-│   ├── shared-types/
-│   ├── validation/
-│   ├── ui/
-│   └── configuration/
-│
 ├── infrastructure/
-│   ├── docker/
-│   ├── mosquitto/
-│   ├── postgres/
-│   └── nginx/
-│
 ├── docs/
-│   ├── architecture/
-│   ├── mqtt-topics/
-│   ├── data-model/
-│   ├── dashboard/
-│   └── testing/
-│
-├── docker-compose.yml
+├── package.json
+├── package-lock.json
+├── .gitignore
+├── .editorconfig
+├── .prettierrc.json
+├── .prettierignore
 ├── .env.example
-├── README.md
-└── package.json
+├── AGENTS.md
+└── README.md
 ```
+
+Dashboard workspace package manager olarak npm workspaces kullanır. Bütün workspace'ler tek root
+`package-lock.json` dosyasını paylaşır; child lockfile oluşturulmaz.
 
 ---
 

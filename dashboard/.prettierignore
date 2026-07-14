@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+build
+coverage
+package-lock.json
+README.md
+infrastructure/**/data
+infrastructure/**/volumes
+**/generated
+**/*.generated.*
