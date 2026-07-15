@@ -1,0 +1,2 @@
+# Keep dashboard text files consistent across Windows, Linux and CI.
+dashboard/** text=auto eol=lf
