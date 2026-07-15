@@ -1,0 +1,43 @@
+{
+  "name": "@smart-campus/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "predev": "npm run build --workspace=@smart-campus/contracts",
+    "dev": "nest start --watch",
+    "prebuild": "npm run build --workspace=@smart-campus/contracts",
+    "build": "nest build",
+    "start": "nest start",
+    "start:prod": "node dist/main.js",
+    "lint": "eslint .",
+    "pretypecheck": "npm run build --workspace=@smart-campus/contracts",
+    "typecheck": "tsc --noEmit",
+    "pretest": "npm run build --workspace=@smart-campus/contracts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretest:e2e": "npm run build --workspace=@smart-campus/contracts",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.28",
+    "@nestjs/core": "11.1.28",
+    "@nestjs/platform-express": "11.1.28",
+    "@smart-campus/contracts": "0.1.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "11.0.24",
+    "@nestjs/testing": "11.1.28",
+    "@types/express": "5.0.6",
+    "@types/node": "26.1.1",
+    "@types/supertest": "7.2.1",
+    "eslint": "10.7.0",
+    "supertest": "7.2.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.64.0",
+    "vitest": "4.1.10"
+  }
+}
