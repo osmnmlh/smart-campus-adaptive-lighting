@@ -1,0 +1,51 @@
+name: ${COMPOSE_PROJECT_NAME:-smart-campus-dashboard}
+
+services:
+  postgres:
+    image: postgres:18.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smart_campus}
+      POSTGRES_USER: ${POSTGRES_USER:-smart_campus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in infrastructure/.env}
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - dashboard_infrastructure
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${MQTT_PORT:-1883}:1883'
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+    networks:
+      - dashboard_infrastructure
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "mosquitto_sub -h 127.0.0.1 -p 1883 -t '$$SYS/broker/uptime' -C 1 -W 5 >/dev/null 2>&1",
+        ]
+      interval: 10s
+      timeout: 7s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres_data:
+  mosquitto_data:
+
+networks:
+  dashboard_infrastructure:
+    driver: bridge
