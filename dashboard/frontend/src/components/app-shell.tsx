@@ -13,7 +13,7 @@ export function AppShell({ children }: AppShellProps) {
             <span className="brand-mark" aria-hidden="true" />
             <span>Smart Campus Adaptive Lighting Dashboard</span>
           </div>
-          <span className="phase-label">Frontend Scaffold</span>
+          <span className="phase-label">Overview Dashboard</span>
         </div>
       </header>
 
@@ -22,7 +22,7 @@ export function AppShell({ children }: AppShellProps) {
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>Smart Campus Adaptive Lighting</span>
-          <span>Current Phase: Frontend Scaffold</span>
+          <span>Current Phase: Overview Dashboard</span>
         </div>
       </footer>
     </div>

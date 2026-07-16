@@ -1,4 +1,4 @@
-type StatusTone = 'ready' | 'pending' | 'neutral';
+export type StatusTone = 'ready' | 'pending' | 'neutral' | 'warning' | 'critical';
 
 type StatusBadgeProps = Readonly<{
   label: string;
@@ -8,9 +8,7 @@ type StatusBadgeProps = Readonly<{
 export function StatusBadge({ label, tone = 'neutral' }: StatusBadgeProps) {
   return (
     <span className="status-badge" data-tone={tone}>
-      <span className="status-indicator" aria-hidden="true">
-        ●
-      </span>
+      <span className="status-indicator" aria-hidden="true" />
       <span>{label}</span>
     </span>
   );
