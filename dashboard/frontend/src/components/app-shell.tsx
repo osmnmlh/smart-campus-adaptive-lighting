@@ -17,6 +17,7 @@ export function AppShell({ children }: AppShellProps) {
           <nav className="app-navigation" aria-label="Dashboard navigation">
             <Link href="/">Overview</Link>
             <Link href="/topology">Topology</Link>
+            <Link href="/metrics">Metrics</Link>
           </nav>
         </div>
       </header>
@@ -26,7 +27,7 @@ export function AppShell({ children }: AppShellProps) {
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>Smart Campus Adaptive Lighting</span>
-          <span>Overview and Topology</span>
+          <span>Overview, Topology and Metrics</span>
         </div>
       </footer>
     </div>
