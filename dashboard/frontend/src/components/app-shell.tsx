@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 type AppShellProps = Readonly<{
@@ -13,7 +14,10 @@ export function AppShell({ children }: AppShellProps) {
             <span className="brand-mark" aria-hidden="true" />
             <span>Smart Campus Adaptive Lighting Dashboard</span>
           </div>
-          <span className="phase-label">Overview Dashboard</span>
+          <nav className="app-navigation" aria-label="Dashboard navigation">
+            <Link href="/">Overview</Link>
+            <Link href="/topology">Topology</Link>
+          </nav>
         </div>
       </header>
 
@@ -22,7 +26,7 @@ export function AppShell({ children }: AppShellProps) {
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>Smart Campus Adaptive Lighting</span>
-          <span>Current Phase: Overview Dashboard</span>
+          <span>Overview and Topology</span>
         </div>
       </footer>
     </div>
