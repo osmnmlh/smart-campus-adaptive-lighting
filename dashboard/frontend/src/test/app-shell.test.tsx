@@ -21,15 +21,15 @@ describe('AppShell', () => {
     expect(screen.getByText('Hazır')).toBeVisible();
   });
 
-  it('backend durumunu henüz scaffold edilmedi olarak gösterir', () => {
+  it('backend bağlantısının henüz aktif olmadığını gösterir', () => {
     render(<HomePage />);
 
-    expect(screen.getByText('Henüz scaffold edilmedi')).toBeVisible();
+    expect(screen.getByText(/Backend bağlantısı henüz aktif değil/i)).toBeVisible();
   });
 
-  it('uydurma node veya telemetry ölçümü göstermez', () => {
+  it('uydurma enerji veya finansal ölçüm göstermez', () => {
     render(<HomePage />);
 
-    expect(screen.queryByText(/node-\d+|\d+\s*(lux|kwh|watt)/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/kwh|watt|energy saving|maliyet|cost/i)).not.toBeInTheDocument();
   });
 });
