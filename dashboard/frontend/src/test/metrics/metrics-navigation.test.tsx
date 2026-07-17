@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { usePathname } from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppShell } from '@/components/app-shell';
+
+const pathnameMock = vi.mocked(usePathname);
+
+beforeEach(() => {
+  pathnameMock.mockReturnValue('/');
+});
 
 describe('metrics navigation', () => {
   it('links Overview, Topology, and Metrics routes', () => {
@@ -26,5 +33,24 @@ describe('metrics navigation', () => {
     expect(screen.getByRole('navigation', { name: 'Dashboard navigation' })).toBeVisible();
     expect(screen.getAllByRole('link')).toHaveLength(3);
     expect(screen.getByText('Overview, Topology and Metrics')).toBeVisible();
+  });
+
+  it.each([
+    { pathname: '/', currentLabel: 'Overview' },
+    { pathname: '/topology', currentLabel: 'Topology' },
+    { pathname: '/metrics', currentLabel: 'Metrics' },
+  ])('marks only $currentLabel as current on $pathname', ({ pathname, currentLabel }) => {
+    pathnameMock.mockReturnValue(pathname);
+    render(<AppShell>content</AppShell>);
+
+    const links = screen.getAllByRole('link');
+    expect(screen.getByRole('link', { name: currentLabel })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(links.filter((link) => link.getAttribute('aria-current') === 'page')).toHaveLength(1);
+    links
+      .filter((link) => link.textContent !== currentLabel)
+      .forEach((link) => expect(link).not.toHaveAttribute('aria-current'));
   });
 });

@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { AppNavigation } from './app-navigation';
 
 type AppShellProps = Readonly<{
   children: ReactNode;
@@ -14,11 +14,7 @@ export function AppShell({ children }: AppShellProps) {
             <span className="brand-mark" aria-hidden="true" />
             <span>Smart Campus Adaptive Lighting Dashboard</span>
           </div>
-          <nav className="app-navigation" aria-label="Dashboard navigation">
-            <Link href="/">Overview</Link>
-            <Link href="/topology">Topology</Link>
-            <Link href="/metrics">Metrics</Link>
-          </nav>
+          <AppNavigation />
         </div>
       </header>
 
