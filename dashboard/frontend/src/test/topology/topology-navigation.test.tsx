@@ -14,10 +14,10 @@ describe('topology navigation', () => {
     expect(screen.getByRole('link', { name: 'Topology' })).toHaveAttribute('href', '/topology');
   });
 
-  it('does not advertise routes that do not exist yet', () => {
+  it('advertises Metrics but no routes that do not exist yet', () => {
     render(<AppShell>Content</AppShell>);
 
-    expect(screen.queryByRole('link', { name: 'Metrics' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Metrics' })).toHaveAttribute('href', '/metrics');
     expect(screen.queryByRole('link', { name: 'Alerts' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Logs' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Scenarios' })).not.toBeInTheDocument();

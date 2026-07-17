@@ -1156,3 +1156,453 @@ h3 {
     border-bottom: 1px solid var(--slate-200);
   }
 }
+
+.metrics-dashboard {
+  min-width: 0;
+  display: grid;
+  gap: 24px;
+}
+
+.metrics-header {
+  padding-bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 32px;
+  border-bottom: 1px solid var(--slate-300);
+}
+
+.metrics-header > div:first-child {
+  max-width: 800px;
+}
+
+.metrics-header h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.metrics-header p:last-child {
+  margin: 14px 0 0;
+  color: var(--slate-600);
+}
+
+.metrics-header-meta {
+  min-width: 220px;
+  display: grid;
+  justify-items: end;
+  gap: 9px;
+  color: var(--slate-500);
+  font-size: 0.76rem;
+}
+
+.metrics-toolbar {
+  min-width: 0;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(280px, 1.4fr);
+  align-items: end;
+  gap: 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.metrics-toolbar label,
+.metrics-toolbar fieldset {
+  min-width: 0;
+  margin: 0;
+}
+
+.metrics-toolbar label {
+  display: grid;
+  gap: 6px;
+}
+
+.metrics-toolbar label > span,
+.metrics-toolbar legend {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.metrics-toolbar select,
+.metrics-range-buttons button {
+  min-height: 40px;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+  color: var(--navy-800);
+  background: var(--slate-50);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.metrics-toolbar select {
+  width: 100%;
+  padding: 8px 10px;
+}
+
+.metrics-toolbar fieldset {
+  padding: 0;
+  border: 0;
+}
+
+.metrics-toolbar legend {
+  margin-bottom: 6px;
+}
+
+.metrics-range-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.metrics-range-buttons button {
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.metrics-range-buttons button[aria-pressed='true'] {
+  border-color: var(--teal-700);
+  color: var(--teal-800);
+  background: var(--teal-100);
+}
+
+.metrics-chart-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metric-chart-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.metric-chart-card-wide {
+  grid-column: 1 / -1;
+}
+
+.metric-chart-card > header {
+  min-height: 94px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.metric-chart-card > header p {
+  max-width: 600px;
+  margin: 7px 0 0;
+  color: var(--slate-500);
+  font-size: 0.78rem;
+}
+
+.metric-chart-card > header > span {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--teal-800);
+  background: var(--teal-100);
+  font-size: 0.68rem;
+  font-weight: 780;
+}
+
+.metrics-chart-figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.metrics-chart-canvas,
+.metrics-chart-empty {
+  width: 100%;
+  height: 340px;
+  min-width: 0;
+}
+
+.metrics-chart-empty {
+  padding: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--slate-500);
+  background: var(--slate-50);
+  text-align: center;
+}
+
+.metrics-chart-figure figcaption {
+  min-height: 50px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--slate-200);
+  color: var(--slate-500);
+  background: var(--slate-50);
+  font-size: 0.7rem;
+}
+
+.metrics-summary-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metrics-summary-card,
+.metrics-electrical-state,
+.metrics-data-section,
+.metrics-empty-state {
+  min-width: 0;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.metrics-summary-card {
+  padding: 20px;
+}
+
+.metrics-summary-card > header {
+  margin-bottom: 16px;
+}
+
+.metrics-summary-card > p:last-child {
+  margin: 16px 0 0;
+  color: var(--slate-500);
+  font-size: 0.72rem;
+}
+
+.metrics-quality-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metrics-quality-grid > div {
+  min-width: 0;
+  padding: 12px;
+  border-top: 3px solid var(--slate-300);
+  background: var(--slate-50);
+}
+
+.metrics-quality-grid > div[data-quality='good'] {
+  border-color: var(--teal-700);
+}
+
+.metrics-quality-grid > div[data-quality='stale'] {
+  border-color: var(--amber-800);
+}
+
+.metrics-quality-grid > div[data-quality='invalid'] {
+  border-color: var(--red-800);
+}
+
+.metrics-quality-grid dt {
+  color: var(--slate-500);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.metrics-quality-grid dd {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--navy-800);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.communication-status-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.communication-status-list li {
+  min-width: 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(80px, 0.7fr) repeat(3, minmax(110px, 1fr));
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--slate-200);
+  background: var(--slate-50);
+}
+
+.communication-status-list strong {
+  color: var(--navy-950);
+  font-size: 0.78rem;
+}
+
+.communication-status-list span,
+.communication-status-list small {
+  color: var(--slate-600);
+  font-size: 0.65rem;
+}
+
+.metrics-electrical-state {
+  padding: 20px 22px;
+  border-left: 5px solid var(--slate-500);
+}
+
+.metrics-electrical-state p:last-child {
+  max-width: 820px;
+  margin: 9px 0 0;
+  color: var(--slate-500);
+  font-size: 0.8rem;
+}
+
+.metrics-data-section {
+  overflow: hidden;
+}
+
+.metrics-data-section > header {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.metrics-data-section > header p:last-child {
+  margin: 7px 0 0;
+  color: var(--slate-500);
+  font-size: 0.78rem;
+}
+
+.metrics-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.metrics-data-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.metrics-data-table caption {
+  padding: 10px 18px;
+  color: var(--slate-500);
+  background: var(--slate-50);
+  font-size: 0.68rem;
+  text-align: left;
+}
+
+.metrics-data-table th,
+.metrics-data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--slate-200);
+  color: var(--navy-800);
+  font-size: 0.72rem;
+}
+
+.metrics-data-table thead th {
+  color: var(--slate-500);
+  background: var(--slate-50);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metrics-data-table tbody tr[data-quality='stale'] {
+  background: var(--amber-100);
+}
+
+.metrics-data-table tbody tr[data-quality='invalid'] {
+  background: var(--red-100);
+}
+
+.metrics-table-empty {
+  margin: 0;
+  padding: 30px;
+  color: var(--slate-500);
+  text-align: center;
+}
+
+.metrics-empty-state {
+  min-height: 280px;
+  padding: 36px;
+  display: grid;
+  align-content: center;
+}
+
+.metrics-empty-state > p:not(.eyebrow) {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: var(--slate-500);
+}
+
+@media (max-width: 1020px) {
+  .metrics-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics-toolbar fieldset {
+    grid-column: 1 / -1;
+  }
+
+  .metrics-chart-grid,
+  .metrics-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-chart-card-wide {
+    grid-column: auto;
+  }
+
+  .communication-status-list li {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .metrics-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 20px;
+  }
+
+  .metrics-header-meta {
+    min-width: 0;
+    justify-items: start;
+  }
+
+  .metrics-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-toolbar fieldset {
+    grid-column: auto;
+  }
+
+  .metric-chart-card > header {
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .metrics-chart-canvas,
+  .metrics-chart-empty {
+    height: 300px;
+  }
+
+  .metrics-quality-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .communication-status-list li {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-empty-state {
+    padding: 26px;
+  }
+}
