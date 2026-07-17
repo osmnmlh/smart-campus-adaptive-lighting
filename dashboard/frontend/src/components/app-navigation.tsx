@@ -7,6 +7,7 @@ const navigationItems = [
   { href: '/', label: 'Overview' },
   { href: '/topology', label: 'Topology' },
   { href: '/metrics', label: 'Metrics' },
+  { href: '/scenarios', label: 'Scenarios' },
 ] as const;
 
 function isCurrentRoute(pathname: string, href: string): boolean {
