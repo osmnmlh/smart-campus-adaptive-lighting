@@ -23,7 +23,7 @@ export function AppShell({ children }: AppShellProps) {
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>Smart Campus Adaptive Lighting</span>
-          <span>Overview, Topology and Metrics</span>
+          <span>Overview, Topology, Metrics and Scenarios</span>
         </div>
       </footer>
     </div>

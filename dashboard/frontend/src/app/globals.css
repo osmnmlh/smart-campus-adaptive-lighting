@@ -589,10 +589,15 @@ h3 {
 
   .app-header-inner {
     min-height: 80px;
+    padding-block: 14px;
     align-items: flex-start;
     flex-direction: column;
     justify-content: center;
-    gap: 4px;
+    gap: 10px;
+  }
+
+  .app-navigation {
+    flex-wrap: wrap;
   }
 
   .app-main {
@@ -647,6 +652,441 @@ h3 {
   .overview-state {
     min-height: 300px;
     padding: 28px;
+  }
+}
+
+.scenario-dashboard {
+  display: grid;
+  gap: 22px;
+}
+
+.scenario-header {
+  padding-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  border-bottom: 1px solid var(--slate-300);
+}
+
+.scenario-header > div:first-child {
+  max-width: 760px;
+}
+
+.scenario-header > div:first-child > p:last-child {
+  margin: 14px 0 0;
+  color: var(--slate-600);
+}
+
+.scenario-header-state {
+  min-width: 150px;
+  padding: 13px 16px;
+  border-left: 4px solid var(--teal-700);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.scenario-header-state span,
+.scenario-header-state strong {
+  display: block;
+}
+
+.scenario-header-state span {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.scenario-header-state strong {
+  margin-top: 3px;
+  color: var(--navy-900);
+  font-size: 1.05rem;
+}
+
+.scenario-local-warning {
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  border: 1px solid #ead39a;
+  border-left: 5px solid var(--amber-800);
+  background: var(--amber-100);
+}
+
+.scenario-local-warning p {
+  margin: 0;
+  color: var(--amber-800);
+  font-size: 0.82rem;
+}
+
+.scenario-error {
+  padding: 14px 18px;
+  display: grid;
+  gap: 3px;
+  color: var(--red-800);
+  background: var(--red-100);
+}
+
+.scenario-error strong {
+  font-size: 0.72rem;
+}
+
+.scenario-error span {
+  font-size: 0.82rem;
+}
+
+.scenario-initial-empty {
+  padding: 24px;
+  border: 1px dashed var(--slate-300);
+  border-radius: 8px;
+  background: var(--slate-50);
+}
+
+.scenario-initial-empty p:last-child {
+  margin: 10px 0 0;
+  color: var(--slate-500);
+}
+
+.scenario-selector,
+.scenario-speed-control {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.scenario-selector > legend,
+.scenario-speed-control > legend {
+  margin-bottom: 10px;
+  color: var(--navy-800);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.scenario-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.scenario-option {
+  min-width: 0;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  border: 1px solid var(--slate-300);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.scenario-option[data-selected='true'] {
+  border-color: var(--teal-700);
+  box-shadow:
+    inset 0 0 0 2px var(--teal-700),
+    var(--shadow);
+}
+
+.scenario-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scenario-option:focus-within {
+  outline: 3px solid var(--teal-700);
+  outline-offset: 3px;
+}
+
+.scenario-option-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scenario-option-heading > span,
+.scenario-option small {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+}
+
+.scenario-option > span:nth-of-type(2) {
+  color: var(--slate-600);
+  font-size: 0.75rem;
+}
+
+.scenario-selector:disabled .scenario-option {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.scenario-controls,
+.scenario-progress-card,
+.scenario-snapshot-card,
+.scenario-event-card {
+  min-width: 0;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.scenario-controls {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+}
+
+.scenario-control-buttons,
+.scenario-speed-control > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.scenario-control-buttons button,
+.scenario-speed-control button {
+  border: 1px solid var(--slate-300);
+  border-radius: 6px;
+  padding: 8px 11px;
+  color: var(--navy-800);
+  cursor: pointer;
+  background: var(--slate-50);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.scenario-control-buttons button:hover:not(:disabled),
+.scenario-speed-control button:hover,
+.scenario-speed-control button[aria-pressed='true'] {
+  border-color: var(--teal-700);
+  color: var(--teal-800);
+  background: var(--teal-100);
+}
+
+.scenario-control-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.scenario-control-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--slate-500);
+  font-size: 0.72rem;
+}
+
+.scenario-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.scenario-progress-card,
+.scenario-snapshot-card,
+.scenario-event-card {
+  overflow: hidden;
+}
+
+.scenario-progress-card > header,
+.scenario-snapshot-card > header,
+.scenario-event-card > header {
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.scenario-progress-track {
+  height: 10px;
+  margin: 20px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--slate-200);
+}
+
+.scenario-progress-track span {
+  height: 100%;
+  display: block;
+  background: var(--teal-700);
+}
+
+.scenario-progress-meta,
+.scenario-snapshot-grid {
+  margin: 0;
+  display: grid;
+}
+
+.scenario-sensor-ids {
+  grid-column: span 2;
+}
+
+.scenario-progress-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0 20px 20px;
+  gap: 8px;
+}
+
+.scenario-progress-meta > div,
+.scenario-snapshot-grid > div {
+  padding: 10px;
+  background: var(--slate-50);
+}
+
+.scenario-progress-meta dt,
+.scenario-snapshot-grid dt {
+  color: var(--slate-500);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.scenario-progress-meta dd,
+.scenario-snapshot-grid dd {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--navy-800);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.scenario-upcoming {
+  padding: 18px 20px;
+  border-top: 1px solid var(--slate-200);
+}
+
+.scenario-upcoming ol,
+.scenario-event-card ol {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenario-upcoming li {
+  padding: 8px 0;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 10px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.scenario-upcoming li:last-child {
+  border-bottom: 0;
+}
+
+.scenario-upcoming time,
+.scenario-upcoming li span,
+.scenario-upcoming p {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+}
+
+.scenario-upcoming li span strong {
+  display: block;
+  color: var(--navy-800);
+}
+
+.scenario-snapshot-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 18px 20px;
+}
+
+.scenario-no-electrical {
+  margin: 0;
+  padding: 12px 20px;
+  border-top: 1px solid var(--slate-200);
+  color: var(--slate-500);
+  background: var(--slate-50);
+  font-size: 0.72rem;
+}
+
+.scenario-event-card > header > span {
+  color: var(--slate-500);
+  font-size: 0.72rem;
+}
+
+.scenario-event-card ol {
+  margin: 0;
+}
+
+.scenario-event-card li {
+  padding: 13px 20px;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 14px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.scenario-event-card li:last-child {
+  border-bottom: 0;
+}
+
+.scenario-event-card time,
+.scenario-event-card small,
+.scenario-event-card li span {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+}
+
+.scenario-event-card li strong,
+.scenario-event-card li span {
+  display: block;
+}
+
+.scenario-empty-list {
+  margin: 0;
+  padding: 30px 20px;
+  color: var(--slate-500);
+  text-align: center;
+}
+
+@media (max-width: 1020px) {
+  .scenario-selector-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scenario-controls,
+  .scenario-two-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .scenario-header,
+  .scenario-local-warning {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .scenario-header {
+    flex-direction: column;
+  }
+
+  .scenario-selector-grid,
+  .scenario-snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-sensor-ids {
+    grid-column: auto;
+  }
+
+  .scenario-event-card li {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .scenario-event-card li small {
+    grid-column: 2;
   }
 }
 
