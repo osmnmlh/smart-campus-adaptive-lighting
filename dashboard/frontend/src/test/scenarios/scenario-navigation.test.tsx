@@ -8,16 +8,16 @@ const pathnameMock = vi.mocked(usePathname);
 beforeEach(() => pathnameMock.mockReturnValue('/scenarios'));
 
 describe('scenario navigation', () => {
-  it('links exactly the four implemented dashboard routes', () => {
+  it('links exactly the six implemented dashboard routes', () => {
     render(<AppShell>Scenario content</AppShell>);
     expect(screen.getByRole('navigation', { name: 'Dashboard navigation' })).toBeVisible();
-    expect(screen.getAllByRole('link')).toHaveLength(4);
+    expect(screen.getAllByRole('link')).toHaveLength(6);
     expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'Topology' })).toHaveAttribute('href', '/topology');
     expect(screen.getByRole('link', { name: 'Metrics' })).toHaveAttribute('href', '/metrics');
     expect(screen.getByRole('link', { name: 'Scenarios' })).toHaveAttribute('href', '/scenarios');
-    expect(screen.queryByRole('link', { name: 'Alerts' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Logs' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alerts' })).toHaveAttribute('href', '/alerts');
+    expect(screen.getByRole('link', { name: 'Logs' })).toHaveAttribute('href', '/logs');
     expect(screen.getByText('Overview, Topology, Metrics and Scenarios')).toBeVisible();
   });
 

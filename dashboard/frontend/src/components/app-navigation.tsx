@@ -8,6 +8,8 @@ const navigationItems = [
   { href: '/topology', label: 'Topology' },
   { href: '/metrics', label: 'Metrics' },
   { href: '/scenarios', label: 'Scenarios' },
+  { href: '/alerts', label: 'Alerts' },
+  { href: '/logs', label: 'Logs' },
 ] as const;
 
 function isCurrentRoute(pathname: string, href: string): boolean {

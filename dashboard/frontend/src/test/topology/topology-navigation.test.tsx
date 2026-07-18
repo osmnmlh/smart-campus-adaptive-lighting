@@ -14,12 +14,12 @@ describe('topology navigation', () => {
     expect(screen.getByRole('link', { name: 'Topology' })).toHaveAttribute('href', '/topology');
   });
 
-  it('advertises Metrics and Scenarios but no unavailable routes', () => {
+  it('advertises all implemented routes', () => {
     render(<AppShell>Content</AppShell>);
 
     expect(screen.getByRole('link', { name: 'Metrics' })).toHaveAttribute('href', '/metrics');
     expect(screen.getByRole('link', { name: 'Scenarios' })).toHaveAttribute('href', '/scenarios');
-    expect(screen.queryByRole('link', { name: 'Alerts' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Logs' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alerts' })).toHaveAttribute('href', '/alerts');
+    expect(screen.getByRole('link', { name: 'Logs' })).toHaveAttribute('href', '/logs');
   });
 });
