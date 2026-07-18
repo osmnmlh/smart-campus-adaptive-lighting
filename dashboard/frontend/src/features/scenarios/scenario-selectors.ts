@@ -1,6 +1,6 @@
 import {
   DataSource,
-  Direction,
+  LampOperatingState,
   MetricQuality,
   SystemMode,
   type ScenarioEvent,
@@ -15,7 +15,7 @@ import type {
 export const selectProgressPercent = (state: ScenarioControllerState): number => {
   const durationMs = state.definition?.durationMs ?? 0;
   if (durationMs === 0) return 0;
-  return Math.min(100, (state.elapsedMs / durationMs) * 100);
+  return Math.min(100, Math.max(0, (state.elapsedMs / durationMs) * 100));
 };
 
 export const selectRemainingEventCount = (state: ScenarioControllerState): number =>
@@ -28,44 +28,37 @@ export const selectUpcomingEvents = (
   state.definition?.events.slice(state.processedEventCount, state.processedEventCount + limit) ??
   [];
 
-export const selectDirection = (state: ScenarioControllerState): Direction => {
-  const processed = state.definition?.events.slice(0, state.processedEventCount) ?? [];
-  if (
-    processed.some(
-      (event) => event.type === 'SENSOR_ACTIVATED' && event.target.entityId === 'sensor-ir-2',
-    )
-  ) {
-    return Direction.LEFT_TO_RIGHT;
-  }
-  if (
-    processed.some(
-      (event) => event.type === 'SENSOR_ACTIVATED' && event.target.entityId === 'sensor-ir-4',
-    )
-  ) {
-    return Direction.RIGHT_TO_LEFT;
-  }
-  return Direction.NONE;
-};
+export const selectSnapshotPreview = (
+  state: ScenarioControllerState,
+): ScenarioSnapshotPreview | null => {
+  if (state.definition === null || state.selectedScenarioId === null) return null;
 
-export const selectSnapshotPreview = (state: ScenarioControllerState): ScenarioSnapshotPreview => ({
-  snapshotAt: formatScenarioTimestamp(state.elapsedMs),
-  systemMode: state.definition?.initialState.systemMode ?? SystemMode.AUTO_ADAPTIVE,
-  lifecycle: state.lifecycle,
-  direction: selectDirection(state),
-  nodeCount: 3,
-  onlineNodeCount: 3 - state.offlineNodeIds.length,
-  lampCount: 5,
-  activeLampCount: new Set(
-    state.activeSensorIds
-      .filter((sensorId) => sensorId.startsWith('sensor-ir-'))
-      .map((sensorId) => sensorId.replace('sensor-ir-', 'lamp-')),
-  ).size,
-  sensorCount: 6,
-  activeSensorCount: state.activeSensorIds.length,
-  activeAlertCount: state.offlineNodeIds.length,
-  source: DataSource.SIMULATED,
-  quality: MetricQuality.GOOD,
-});
+  return {
+    virtualTimestamp: formatScenarioTimestamp(state.elapsedMs),
+    systemMode: state.definition.initialState.systemMode ?? SystemMode.AUTO_ADAPTIVE,
+    lifecycle: state.lifecycle,
+    direction: state.direction,
+    totalNodeCount: 3,
+    activeNodeCount: 3 - state.offlineNodeIds.length,
+    totalLampCount: state.lamps.length,
+    activeLampCount: state.lamps.filter((lamp) => lamp.operatingState === LampOperatingState.ACTIVE)
+      .length,
+    preLightLampCount: state.lamps.filter(
+      (lamp) => lamp.operatingState === LampOperatingState.PRE_LIGHT,
+    ).length,
+    standbyLampCount: state.lamps.filter(
+      (lamp) => lamp.operatingState === LampOperatingState.STANDBY,
+    ).length,
+    offLampCount: state.lamps.filter((lamp) => lamp.operatingState === LampOperatingState.OFF)
+      .length,
+    totalSensorCount: 6,
+    activeSensorCount: state.activeSensorIds.length,
+    activeSensorIds: [...state.activeSensorIds],
+    activeAlertCount: state.offlineNodeIds.length,
+    source: DataSource.SIMULATED,
+    quality: MetricQuality.GOOD,
+  };
+};
 
 export type ScenarioControlAvailability = Readonly<{
   canStart: boolean;

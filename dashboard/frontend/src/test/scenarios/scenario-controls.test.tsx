@@ -3,6 +3,15 @@ import { vi } from 'vitest';
 import { ScenarioControls } from '@/components/scenarios/scenario-controls';
 
 describe('ScenarioControls', () => {
+  it('keeps lifecycle controls unavailable before a scenario is selected', () => {
+    const dispatch = vi.fn();
+    render(<ScenarioControls lifecycle="IDLE" speed={1} dispatch={dispatch} />);
+
+    ['Start', 'Pause', 'Resume', 'Reset', 'Step +1s', 'Advance +5s'].forEach((name) => {
+      expect(screen.getByRole('button', { name })).toBeDisabled();
+    });
+  });
+
   it('enables only start in ready state and exposes every speed', () => {
     const dispatch = vi.fn();
     render(<ScenarioControls lifecycle="READY" speed={1} dispatch={dispatch} />);

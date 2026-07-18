@@ -18,7 +18,7 @@ export function ScenarioSelector({
     <fieldset className="scenario-selector" disabled={disabled}>
       <legend>Choose a local scenario</legend>
       <div className="scenario-selector-grid">
-        {items.map(({ id, definition, eventCount }) => (
+        {items.map(({ id, definition, eventCount, simulated }) => (
           <label key={id} className="scenario-option" data-selected={selectedId === id}>
             <input
               type="radio"
@@ -32,7 +32,9 @@ export function ScenarioSelector({
               <span>{formatScenarioDuration(definition.durationMs)}</span>
             </span>
             <span>{definition.description}</span>
-            <small>{eventCount} scheduled events</small>
+            <small>
+              {eventCount} scheduled events · {simulated ? 'SIMULATED' : 'UNAVAILABLE'}
+            </small>
           </label>
         ))}
       </div>

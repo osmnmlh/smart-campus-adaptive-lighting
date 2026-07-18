@@ -12,10 +12,20 @@ import {
   scenarioControllerReducer,
 } from '@/features/scenarios/scenario-reducer';
 import { selectSnapshotPreview } from '@/features/scenarios/scenario-selectors';
+import type { ScenarioTransitionError } from '@/features/scenarios/scenario-model';
+
+export function ScenarioErrorNotice({ error }: Readonly<{ error: ScenarioTransitionError }>) {
+  return (
+    <div className="scenario-error" role="status" aria-live="polite">
+      <strong>{error.code}</strong>
+      <span>{error.message}</span>
+    </div>
+  );
+}
 
 export function ScenarioDashboard() {
   const [state, dispatch] = useReducer(scenarioControllerReducer, undefined, () =>
-    createScenarioControllerState(),
+    createScenarioControllerState(null),
   );
   const snapshot = selectSnapshotPreview(state);
   const selectionLocked = state.lifecycle === 'RUNNING' || state.lifecycle === 'PAUSED';
@@ -45,11 +55,7 @@ export function ScenarioDashboard() {
         </p>
       </aside>
 
-      {state.errorMessage === null ? null : (
-        <div className="scenario-error" role="alert">
-          {state.errorMessage}
-        </div>
-      )}
+      {state.lastError === null ? null : <ScenarioErrorNotice error={state.lastError} />}
 
       <ScenarioSelector
         items={scenarioCatalog}
@@ -57,6 +63,13 @@ export function ScenarioDashboard() {
         disabled={selectionLocked}
         onSelect={(scenarioId) => dispatch({ type: 'SELECT_SCENARIO', scenarioId })}
       />
+      {state.selectedScenarioId === null ? (
+        <section className="scenario-initial-empty" aria-labelledby="scenario-empty-title">
+          <p className="eyebrow">No scenario selected</p>
+          <h2 id="scenario-empty-title">Choose a simulated scenario to begin</h2>
+          <p>The catalog remains local, deterministic, and disconnected from production devices.</p>
+        </section>
+      ) : null}
       <ScenarioControls lifecycle={state.lifecycle} speed={state.speed} dispatch={dispatch} />
 
       <div className="scenario-two-column">

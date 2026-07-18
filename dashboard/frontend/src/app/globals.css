@@ -723,8 +723,30 @@ h3 {
 
 .scenario-error {
   padding: 14px 18px;
+  display: grid;
+  gap: 3px;
   color: var(--red-800);
   background: var(--red-100);
+}
+
+.scenario-error strong {
+  font-size: 0.72rem;
+}
+
+.scenario-error span {
+  font-size: 0.82rem;
+}
+
+.scenario-initial-empty {
+  padding: 24px;
+  border: 1px dashed var(--slate-300);
+  border-radius: 8px;
+  background: var(--slate-50);
+}
+
+.scenario-initial-empty p:last-child {
+  margin: 10px 0 0;
+  color: var(--slate-500);
 }
 
 .scenario-selector,
@@ -904,6 +926,10 @@ h3 {
   display: grid;
 }
 
+.scenario-sensor-ids {
+  grid-column: span 2;
+}
+
 .scenario-progress-meta {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 0 20px 20px;
@@ -1049,6 +1075,10 @@ h3 {
   .scenario-selector-grid,
   .scenario-snapshot-grid {
     grid-template-columns: 1fr;
+  }
+
+  .scenario-sensor-ids {
+    grid-column: auto;
   }
 
   .scenario-event-card li {

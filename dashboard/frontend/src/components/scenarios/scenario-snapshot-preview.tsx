@@ -10,7 +10,24 @@ const lifecycleTone: Record<Snapshot['lifecycle'], StatusTone> = {
   ERROR: 'critical',
 };
 
-export function ScenarioSnapshotPreview({ snapshot }: Readonly<{ snapshot: Snapshot }>) {
+export function ScenarioSnapshotPreview({ snapshot }: Readonly<{ snapshot: Snapshot | null }>) {
+  if (snapshot === null) {
+    return (
+      <section className="scenario-snapshot-card" aria-labelledby="scenario-snapshot-title">
+        <header>
+          <div>
+            <p className="eyebrow">Read-only local projection</p>
+            <h2 id="scenario-snapshot-title">Snapshot preview</h2>
+          </div>
+          <StatusBadge label="UNAVAILABLE" tone="neutral" />
+        </header>
+        <p className="scenario-empty-list">
+          Select a simulated scenario to create its deterministic starting snapshot.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="scenario-snapshot-card" aria-labelledby="scenario-snapshot-title">
       <header>
@@ -26,29 +43,49 @@ export function ScenarioSnapshotPreview({ snapshot }: Readonly<{ snapshot: Snaps
           <dd>{snapshot.systemMode}</dd>
         </div>
         <div>
-          <dt>Timestamp</dt>
-          <dd>{snapshot.snapshotAt}</dd>
+          <dt>Virtual timestamp</dt>
+          <dd>{snapshot.virtualTimestamp}</dd>
         </div>
         <div>
           <dt>Direction</dt>
           <dd>{snapshot.direction}</dd>
         </div>
         <div>
-          <dt>Nodes</dt>
+          <dt>Active nodes</dt>
           <dd>
-            {snapshot.onlineNodeCount} / {snapshot.nodeCount} online
+            {snapshot.activeNodeCount} / {snapshot.totalNodeCount}
           </dd>
         </div>
         <div>
-          <dt>Lamps</dt>
-          <dd>
-            {snapshot.activeLampCount} / {snapshot.lampCount} active
-          </dd>
+          <dt>Active lamps</dt>
+          <dd>{snapshot.activeLampCount}</dd>
         </div>
         <div>
-          <dt>Sensors</dt>
+          <dt>Pre-light lamps</dt>
+          <dd>{snapshot.preLightLampCount}</dd>
+        </div>
+        <div>
+          <dt>Standby lamps</dt>
+          <dd>{snapshot.standbyLampCount}</dd>
+        </div>
+        <div>
+          <dt>Off lamps</dt>
+          <dd>{snapshot.offLampCount}</dd>
+        </div>
+        <div>
+          <dt>Total lamps</dt>
+          <dd>{snapshot.totalLampCount}</dd>
+        </div>
+        <div>
+          <dt>Active sensors</dt>
           <dd>
-            {snapshot.activeSensorCount} / {snapshot.sensorCount} active
+            {snapshot.activeSensorCount} / {snapshot.totalSensorCount}
+          </dd>
+        </div>
+        <div className="scenario-sensor-ids">
+          <dt>Active sensor IDs</dt>
+          <dd>
+            {snapshot.activeSensorIds.length === 0 ? 'None' : snapshot.activeSensorIds.join(', ')}
           </dd>
         </div>
         <div>

@@ -13,7 +13,7 @@ export function ScenarioEventList({ events }: Readonly<{ events: readonly Presen
       </header>
       {events.length === 0 ? (
         <p className="scenario-empty-list">
-          Start the scenario to create local presentation events.
+          Select and start a scenario to create local presentation events.
         </p>
       ) : (
         <ol aria-live="polite" reversed>
