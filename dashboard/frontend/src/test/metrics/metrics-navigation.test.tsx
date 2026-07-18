@@ -20,18 +20,14 @@ describe('metrics navigation', () => {
     expect(screen.getByRole('link', { name: 'Topology' })).toHaveAttribute('href', '/topology');
     expect(screen.getByRole('link', { name: 'Metrics' })).toHaveAttribute('href', '/metrics');
     expect(screen.getByRole('link', { name: 'Scenarios' })).toHaveAttribute('href', '/scenarios');
-  });
-
-  it('does not add unavailable route links', () => {
-    render(<AppShell>content</AppShell>);
-    expect(screen.queryByRole('link', { name: 'Alerts' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Logs' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alerts' })).toHaveAttribute('href', '/alerts');
+    expect(screen.getByRole('link', { name: 'Logs' })).toHaveAttribute('href', '/logs');
   });
 
   it('keeps the dashboard navigation accessible', () => {
     render(<AppShell>content</AppShell>);
     expect(screen.getByRole('navigation', { name: 'Dashboard navigation' })).toBeVisible();
-    expect(screen.getAllByRole('link')).toHaveLength(4);
+    expect(screen.getAllByRole('link')).toHaveLength(6);
     expect(screen.getByText('Overview, Topology, Metrics and Scenarios')).toBeVisible();
   });
 
@@ -40,6 +36,8 @@ describe('metrics navigation', () => {
     { pathname: '/topology', currentLabel: 'Topology' },
     { pathname: '/metrics', currentLabel: 'Metrics' },
     { pathname: '/scenarios', currentLabel: 'Scenarios' },
+    { pathname: '/alerts', currentLabel: 'Alerts' },
+    { pathname: '/logs', currentLabel: 'Logs' },
   ])('marks only $currentLabel as current on $pathname', ({ pathname, currentLabel }) => {
     pathnameMock.mockReturnValue(pathname);
     render(<AppShell>content</AppShell>);
