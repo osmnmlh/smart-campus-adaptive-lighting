@@ -324,10 +324,124 @@ h3 {
 }
 
 .status-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
+  width: 14px;
+  height: 14px;
+  display: inline-grid;
+  flex: 0 0 14px;
+  place-items: center;
+  color: currentColor;
+  background: transparent;
+}
+
+.status-indicator > svg {
+  width: 14px;
+  height: 14px;
+}
+
+.gauge-meter {
+  min-width: 0;
+  margin-top: 14px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 7px;
+  background: var(--white);
+}
+
+.gauge-meter[data-valid='false'] {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  color: var(--slate-600);
+}
+
+.gauge-meter[data-tone='ready'] {
+  --gauge-color: var(--teal-700);
+}
+
+.gauge-meter[data-tone='pending'],
+.gauge-meter[data-tone='warning'] {
+  --gauge-color: var(--amber-800);
+}
+
+.gauge-meter[data-tone='critical'] {
+  --gauge-color: var(--red-800);
+}
+
+.gauge-meter[data-tone='neutral'] {
+  --gauge-color: var(--navy-700);
+}
+
+.gauge-meter-visual {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.gauge-meter-visual svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.gauge-meter-track,
+.gauge-meter-progress {
+  fill: none;
+  stroke-width: 9;
+}
+
+.gauge-meter-track {
+  stroke: var(--slate-200);
+}
+
+.gauge-meter-progress {
+  stroke: var(--gauge-color);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 240ms ease;
+}
+
+.gauge-meter-value {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--navy-900);
+  font-size: 0.8rem;
+}
+
+.gauge-meter-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.gauge-meter-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--navy-800);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.gauge-meter-copy small,
+.gauge-meter[data-valid='false'] small {
+  color: var(--slate-500);
+  font-size: 0.65rem;
+}
+
+.data-provenance {
+  width: fit-content;
+  padding: 2px 6px;
+  border: 1px solid var(--slate-200);
+  border-radius: 999px;
+  color: var(--slate-600);
+  background: var(--slate-50);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 .status-badge[data-tone='ready'] {
@@ -882,6 +996,244 @@ h3 {
   font-size: 0.72rem;
 }
 
+.scenario-stage {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.scenario-stage-header {
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.scenario-stage-header p:last-child {
+  margin: 6px 0 0;
+  color: var(--slate-500);
+  font-size: 0.78rem;
+}
+
+.scenario-stage-status,
+.scenario-stage-node-status {
+  padding: 10px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  border-bottom: 1px solid var(--slate-200);
+  color: var(--slate-600);
+  background: var(--slate-50);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.scenario-stage-status span,
+.scenario-stage-node-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scenario-stage-node-status span[data-offline='true'] {
+  color: var(--red-800);
+}
+
+.scenario-stage-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.scenario-stage-svg {
+  width: 100%;
+  min-width: 680px;
+  height: auto;
+  display: block;
+}
+
+.scenario-stage-ground {
+  fill: #f8fafb;
+  stroke: var(--slate-200);
+}
+
+.scenario-road {
+  fill: none;
+  stroke: var(--navy-800);
+  stroke-width: 54;
+  stroke-linecap: round;
+}
+
+.scenario-road-center {
+  fill: none;
+  stroke: var(--slate-300);
+  stroke-width: 2;
+  stroke-dasharray: 22 14;
+}
+
+.scenario-node-group rect {
+  fill: rgba(217, 241, 239, 0.2);
+  stroke: var(--teal-700);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.scenario-node-group text {
+  fill: var(--teal-800);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.scenario-node-group[data-offline='true'] rect {
+  fill: rgba(203, 214, 220, 0.3);
+  stroke: var(--slate-500);
+  stroke-dasharray: 9 6;
+}
+
+.scenario-node-group[data-offline='true'] text {
+  fill: var(--red-800);
+}
+
+.scenario-ambient-sensor circle {
+  fill: var(--amber-100);
+  stroke: var(--amber-800);
+  stroke-width: 2;
+}
+
+.scenario-ambient-sensor path {
+  fill: none;
+  stroke: var(--amber-800);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.scenario-ambient-sensor text {
+  fill: var(--amber-800);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.scenario-lamp-halo {
+  fill: #f3c95b;
+}
+
+.scenario-lamp-pole,
+.scenario-lamp-arm {
+  fill: none;
+  stroke: var(--navy-700);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.scenario-lamp-light {
+  fill: #f3c95b;
+  stroke: var(--amber-800);
+  stroke-width: 1.5;
+}
+
+.scenario-lamp[data-operating-state='OFF'] .scenario-lamp-light {
+  fill: var(--slate-300);
+  stroke: var(--slate-500);
+}
+
+.scenario-lamp-id {
+  fill: var(--navy-950);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.scenario-lamp-state,
+.scenario-lamp-brightness,
+.scenario-sensor text,
+.scenario-motion-marker text,
+.scenario-direction-arrow text {
+  fill: var(--slate-600);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.scenario-sensor-pulse {
+  fill: transparent;
+  stroke: transparent;
+}
+
+.scenario-sensor-dot {
+  fill: var(--slate-300);
+  stroke: var(--slate-600);
+  stroke-width: 2;
+}
+
+.scenario-sensor.is-active .scenario-sensor-dot {
+  fill: var(--teal-700);
+  stroke: var(--teal-800);
+}
+
+.scenario-sensor.is-active .scenario-sensor-pulse {
+  stroke: var(--teal-700);
+  stroke-width: 2;
+  animation: scenario-sensor-pulse 1.6s ease-out infinite;
+}
+
+.scenario-motion-marker {
+  color: var(--teal-800);
+  transition: transform 400ms ease;
+}
+
+.scenario-motion-marker circle {
+  fill: var(--teal-100);
+  stroke: var(--teal-800);
+  stroke-width: 2;
+}
+
+.scenario-motion-marker path {
+  fill: none;
+  stroke: var(--teal-800);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.scenario-direction-arrow line {
+  stroke: var(--teal-800);
+  stroke-width: 3;
+}
+
+.scenario-stage-svg marker path {
+  fill: var(--teal-800);
+}
+
+.scenario-direction-arrow text {
+  fill: var(--teal-800);
+}
+
+.scenario-stage figcaption {
+  padding: 12px 20px;
+  border-top: 1px solid var(--slate-200);
+  color: var(--slate-500);
+  font-size: 0.7rem;
+}
+
+@keyframes scenario-sensor-pulse {
+  from {
+    opacity: 0.75;
+    transform: scale(0.72);
+    transform-origin: center;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.25);
+    transform-origin: center;
+  }
+}
+
 .scenario-two-column {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -1077,6 +1429,17 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .scenario-stage-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .scenario-stage-status,
+  .scenario-stage-node-status {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .scenario-sensor-ids {
     grid-column: auto;
   }
@@ -1098,6 +1461,14 @@ h3 {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .scenario-motion-marker {
+    transition: none;
+  }
+
+  .scenario-sensor.is-active .scenario-sensor-pulse {
+    animation: none;
   }
 }
 

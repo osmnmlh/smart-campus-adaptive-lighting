@@ -20,6 +20,7 @@ describe('ScenarioDashboard', () => {
     expect(screen.getAllByRole('radio')).toHaveLength(5);
     screen.getAllByRole('radio').forEach((radio) => expect(radio).not.toBeChecked());
     expect(screen.getByRole('heading', { name: 'Scenario controls' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Campus road stage' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Progress' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Snapshot preview' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Presentation events' })).toBeVisible();
@@ -38,6 +39,27 @@ describe('ScenarioDashboard', () => {
     expect(screen.getAllByText(/SIMULATED/)).toHaveLength(5);
     expect(screen.queryByText('GOOD')).not.toBeInTheDocument();
     expect(screen.getByText(/Select a simulated scenario to create/i)).toBeVisible();
+  });
+
+  it('places the stage before progress and preserves the snapshot preview', () => {
+    render(<ScenarioDashboard />);
+    const stage = screen.getByRole('figure', { name: 'Campus road stage' });
+    const progress = screen.getByRole('heading', { name: 'Progress' }).closest('section');
+
+    expect(stage.compareDocumentPosition(progress!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.getByRole('heading', { name: 'Snapshot preview' })).toBeVisible();
+  });
+
+  it('updates the stage from deterministic left-to-right controller steps', () => {
+    const { container } = render(<ScenarioDashboard />);
+    fireEvent.click(screen.getByRole('radio', { name: /Left to Right/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Step +1s' }));
+    expect(container.querySelector('[data-motion-position="L1"]')).not.toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Step +1s' }));
+    expect(container.querySelector('[data-motion-position="L2"]')).not.toBeNull();
+    expect(container.querySelector('[data-direction="LEFT_TO_RIGHT"]')).not.toBeNull();
   });
 
   it('runs left-to-right deterministically with manual steps', () => {

@@ -21,6 +21,7 @@
     "@smart-campus/contracts": "0.1.0",
     "@xyflow/react": "12.11.2",
     "echarts": "6.1.0",
+    "lucide-react": "1.25.0",
     "next": "16.2.11",
     "react": "19.2.7",
     "react-dom": "19.2.7"

@@ -6,6 +6,7 @@ import { ScenarioEventList } from './scenario-event-list';
 import { ScenarioProgress } from './scenario-progress';
 import { ScenarioSelector } from './scenario-selector';
 import { ScenarioSnapshotPreview } from './scenario-snapshot-preview';
+import { ScenarioStage } from './scenario-stage';
 import { scenarioCatalog } from '@/features/scenarios/scenario-fixtures';
 import {
   createScenarioControllerState,
@@ -71,6 +72,8 @@ export function ScenarioDashboard() {
         </section>
       ) : null}
       <ScenarioControls lifecycle={state.lifecycle} speed={state.speed} dispatch={dispatch} />
+
+      <ScenarioStage state={state} />
 
       <div className="scenario-two-column">
         <ScenarioProgress state={state} />
