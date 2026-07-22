@@ -155,3 +155,5 @@ export {
   WebSocketEventTypeSchema,
 } from './transport/websocket-event.schema.js';
 export type { WebSocketEvent } from './transport/websocket-event.schema.js';
+
+export * from './transport/communication.index.js';
