@@ -5,6 +5,8 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module.js';
+import { loadEnvironment } from '../src/common/config/environment.js';
+import { configureRealtimeWebSocketAdapter } from '../src/realtime/transport/realtime-ws-adapter.js';
 
 describe('GET /health', () => {
   let app: INestApplication;
@@ -15,6 +17,7 @@ describe('GET /health', () => {
     }).compile();
 
     app = moduleReference.createNestApplication();
+    configureRealtimeWebSocketAdapter(app, loadEnvironment({ NODE_ENV: 'test' }));
     await app.init();
   });
 
