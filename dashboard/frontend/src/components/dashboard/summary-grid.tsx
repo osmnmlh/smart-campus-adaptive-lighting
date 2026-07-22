@@ -35,15 +35,6 @@ export function SummaryGrid({ model }: SummaryGridProps) {
           tone="neutral"
         />
         <SummaryCard
-          label="Sensors"
-          value={summary.totalSensors}
-          detail={`${summary.healthySensors} healthy`}
-          statusLabel={
-            summary.healthySensors === summary.totalSensors ? 'All healthy' : 'Attention required'
-          }
-          tone={summary.healthySensors === summary.totalSensors ? 'ready' : 'warning'}
-        />
-        <SummaryCard
           label="Active Alerts"
           value={summary.activeAlerts}
           detail={`Highest: ${summary.highestAlertSeverity}`}

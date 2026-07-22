@@ -88,6 +88,12 @@ export function ScenarioSnapshotPreview({ snapshot }: Readonly<{ snapshot: Snaps
             {snapshot.activeSensorIds.length === 0 ? 'None' : snapshot.activeSensorIds.join(', ')}
           </dd>
         </div>
+        <div className="scenario-sensor-ids">
+          <dt>Offline node IDs</dt>
+          <dd>
+            {snapshot.offlineNodeIds.length === 0 ? 'None' : snapshot.offlineNodeIds.join(', ')}
+          </dd>
+        </div>
         <div>
           <dt>Active alerts</dt>
           <dd>{snapshot.activeAlertCount}</dd>
@@ -101,6 +107,19 @@ export function ScenarioSnapshotPreview({ snapshot }: Readonly<{ snapshot: Snaps
           <dd>{snapshot.quality}</dd>
         </div>
       </dl>
+      <div className="scenario-lamp-snapshot">
+        <h3>Lamp snapshot details</h3>
+        <ul aria-label="Lamp snapshot details">
+          {snapshot.lamps.map((lamp) => (
+            <li key={lamp.lampId}>
+              <strong>{lamp.lampId}</strong>
+              <span>{lamp.operatingState}</span>
+              <span>{lamp.brightnessPercent}% brightness</span>
+              <span>{lamp.health}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
       <p className="scenario-no-electrical">
         Electrical metrics are not available in this presentation simulation.
       </p>

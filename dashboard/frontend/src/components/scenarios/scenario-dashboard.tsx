@@ -7,6 +7,7 @@ import { ScenarioProgress } from './scenario-progress';
 import { ScenarioSelector } from './scenario-selector';
 import { ScenarioSnapshotPreview } from './scenario-snapshot-preview';
 import { ScenarioStage } from './scenario-stage';
+import { DisclosurePanel } from '@/components/ui/disclosure-panel';
 import { scenarioCatalog } from '@/features/scenarios/scenario-fixtures';
 import {
   createScenarioControllerState,
@@ -77,7 +78,13 @@ export function ScenarioDashboard() {
 
       <div className="scenario-two-column">
         <ScenarioProgress state={state} />
-        <ScenarioSnapshotPreview snapshot={snapshot} />
+        <DisclosurePanel
+          title="Scenario snapshot details"
+          description="Inspect the complete deterministic state and entity breakdown."
+          className="scenario-snapshot-disclosure"
+        >
+          <ScenarioSnapshotPreview snapshot={snapshot} />
+        </DisclosurePanel>
       </div>
       <ScenarioEventList events={state.recentEvents} />
     </div>

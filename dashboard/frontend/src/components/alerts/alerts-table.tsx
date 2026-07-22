@@ -29,37 +29,55 @@ export function AlertsTable({ records, selectedId, onSelect }: Props) {
           </tr>
         </thead>
         <tbody>
-          {records.map((record) => (
-            <tr key={record.id} data-selected={selectedId === record.id}>
-              <td>{formatActivityTimestamp(record.createdAt)}</td>
-              <td>
-                <span className="activity-label" data-tone={record.severity.toLowerCase()}>
-                  {formatActivityValue(record.severity)}
-                </span>
-              </td>
-              <td>
-                <span className="activity-label" data-tone={record.status.toLowerCase()}>
-                  {formatActivityValue(record.status)}
-                </span>
-              </td>
-              <td>
-                <strong>{record.title}</strong>
-                <small>{record.id}</small>
-              </td>
-              <td>{formatActivityEntity(record.entityId)}</td>
-              <td>{record.scenarioId ?? 'None'}</td>
-              <td>{record.dataSource}</td>
-              <td>
-                <button
-                  type="button"
-                  aria-pressed={selectedId === record.id}
-                  onClick={() => onSelect(record.id)}
-                >
-                  View {record.id}
-                </button>
-              </td>
-            </tr>
-          ))}
+          {records.map((record) => {
+            const critical = record.severity === 'CRITICAL';
+            const activeCritical = critical && record.status === 'ACTIVE';
+
+            return (
+              <tr
+                key={record.id}
+                className={
+                  activeCritical
+                    ? 'alert-row--critical-active'
+                    : critical
+                      ? 'alert-row--critical'
+                      : undefined
+                }
+                data-selected={selectedId === record.id}
+                data-severity={record.severity}
+                data-status={record.status}
+                data-active={record.status === 'ACTIVE'}
+              >
+                <td>{formatActivityTimestamp(record.createdAt)}</td>
+                <td>
+                  <span className="activity-label" data-tone={record.severity.toLowerCase()}>
+                    {formatActivityValue(record.severity)}
+                  </span>
+                </td>
+                <td>
+                  <span className="activity-label" data-tone={record.status.toLowerCase()}>
+                    {formatActivityValue(record.status)}
+                  </span>
+                </td>
+                <td>
+                  <strong>{record.title}</strong>
+                  <small>{record.id}</small>
+                </td>
+                <td>{formatActivityEntity(record.entityId)}</td>
+                <td>{record.scenarioId ?? 'None'}</td>
+                <td>{record.dataSource}</td>
+                <td>
+                  <button
+                    type="button"
+                    aria-pressed={selectedId === record.id}
+                    onClick={() => onSelect(record.id)}
+                  >
+                    View {record.id}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

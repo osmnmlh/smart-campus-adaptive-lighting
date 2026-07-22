@@ -1,4 +1,5 @@
 import type { TopologyGraphModel, TopologyNodeModel } from '@/features/topology/topology-model';
+import { DisclosurePanel } from '@/components/ui/disclosure-panel';
 
 type TopologyAccessibleListProps = Readonly<{
   graph: TopologyGraphModel;
@@ -47,8 +48,14 @@ export function TopologyAccessibleList({
           </section>
         ))}
       </div>
-      <section className="topology-relationships" aria-labelledby="topology-relationships-title">
-        <h3 id="topology-relationships-title">Relationships</h3>
+      <DisclosurePanel
+        title="Relationship details"
+        description="Inspect communication, ownership, and sensing relationships."
+        className="topology-relationships"
+        contentClassName="topology-relationships__content"
+        count={graph.edges.length + 1}
+      >
+        <h3>Relationships</h3>
         <ul>
           {graph.edges.map((edge) => (
             <li key={edge.id}>
@@ -59,7 +66,7 @@ export function TopologyAccessibleList({
             <strong>ambient</strong>: sensor:sensor-bh1750-1 · System ambient sensor
           </li>
         </ul>
-      </section>
+      </DisclosurePanel>
     </section>
   );
 }

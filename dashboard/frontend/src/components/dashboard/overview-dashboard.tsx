@@ -1,11 +1,12 @@
 import { AlertSummary } from './alert-summary';
 import { DataSourceNotice } from './data-source-notice';
-import { LampStatusSummary } from './lamp-status-summary';
+import { LampBrightnessSummary, LampStatusSummary } from './lamp-status-summary';
 import { NodeStatusList } from './node-status-list';
 import { OverviewEmptyState } from './overview-empty-state';
 import { OverviewHeader } from './overview-header';
 import { SensorStatusSummary } from './sensor-status-summary';
 import { SummaryGrid } from './summary-grid';
+import { DisclosurePanel } from '@/components/ui/disclosure-panel';
 import type { OverviewModel } from '@/features/overview/overview-model';
 
 type OverviewDashboardProps = Readonly<{
@@ -27,12 +28,33 @@ export function OverviewDashboard({ model, errorMessage = null }: OverviewDashbo
       <OverviewHeader model={model} />
       <DataSourceNotice model={model} />
       <SummaryGrid model={model} />
-      <NodeStatusList nodes={model.nodes} />
-      <div className="overview-split-grid">
-        <LampStatusSummary lamps={model.lamps} dataSource={model.dataSource} />
-        <SensorStatusSummary sensors={model.sensors} />
+      <div className="overview-primary-grid">
+        <LampBrightnessSummary lamps={model.lamps} dataSource={model.dataSource} />
+        <AlertSummary alerts={model.alerts} summary={model.summary} />
       </div>
-      <AlertSummary alerts={model.alerts} summary={model.summary} />
+      <div className="overview-advanced-details">
+        <DisclosurePanel
+          title="Infrastructure details"
+          description="Inspect node health, communication, and lamp ownership."
+          count={model.nodes.length}
+        >
+          <NodeStatusList nodes={model.nodes} />
+        </DisclosurePanel>
+        <DisclosurePanel
+          title="Lighting and sensor details"
+          description="Inspect health, targets, PWM values, sensor activity, and quality."
+          count={model.lamps.length + model.sensors.length}
+        >
+          <div className="overview-split-grid">
+            <LampStatusSummary
+              lamps={model.lamps}
+              dataSource={model.dataSource}
+              showGauge={false}
+            />
+            <SensorStatusSummary sensors={model.sensors} />
+          </div>
+        </DisclosurePanel>
+      </div>
     </div>
   );
 }

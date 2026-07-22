@@ -14,9 +14,9 @@ describe('AlertsDashboard', () => {
     render(<AlertsDashboard />);
     const summary = screen.getByRole('heading', { name: 'Dataset summary' }).closest('section');
     if (summary === null) throw new Error('Expected alert summary section');
-    expect(within(summary).getByText('Total alerts').parentElement).toHaveTextContent('15');
-    expect(within(summary).getByText('Active').parentElement).toHaveTextContent('5');
-    expect(within(summary).getByText('Resolved').parentElement).toHaveTextContent('10');
+    expect(within(summary).getByLabelText('Total alerts summary')).toHaveTextContent('15');
+    expect(within(summary).getByLabelText('Active summary')).toHaveTextContent('5');
+    expect(within(summary).getByLabelText('Resolved summary')).toHaveTextContent('10');
     expect(
       screen.getByRole('table', { name: 'Simulated alert history, newest first' }),
     ).toBeVisible();

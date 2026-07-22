@@ -7,13 +7,16 @@ import { topologySnapshot } from '@/features/topology/topology-fixture';
 const graph = createTopologyGraph(topologySnapshot);
 
 describe('TopologyAccessibleList', () => {
-  it('renders visible controller, lamp, sensor, and relationship sections', () => {
+  it('renders visible entities and user-opened relationship sections', () => {
     render(<TopologyAccessibleList graph={graph} selectedEntityId={null} onSelect={() => {}} />);
 
     expect(screen.getByRole('heading', { name: 'Topology List' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Controllers' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Lamps' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Sensors' })).toBeVisible();
+    const relationships = screen.getByText('Relationship details').closest('details');
+    expect(relationships).not.toHaveAttribute('open');
+    fireEvent.click(screen.getByText('Relationship details').closest('summary')!);
     expect(screen.getByRole('heading', { name: 'Relationships' })).toBeVisible();
     expect(screen.getByText(/controller:node-1 → controller:node-2/)).toBeVisible();
     expect(screen.getByText(/System ambient sensor/)).toBeVisible();

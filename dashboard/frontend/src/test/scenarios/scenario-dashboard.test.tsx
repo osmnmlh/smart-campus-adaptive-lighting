@@ -2,6 +2,10 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ScenarioDashboard, ScenarioErrorNotice } from '@/components/scenarios/scenario-dashboard';
 
 function snapshotValue(label: string) {
+  const details = screen.getByText('Scenario snapshot details').closest('details');
+  if (details && !details.open) {
+    fireEvent.click(within(details).getByText('Scenario snapshot details').closest('summary')!);
+  }
   const snapshot = screen.getByRole('heading', { name: 'Snapshot preview' }).closest('section');
   expect(snapshot).not.toBeNull();
   const term = within(snapshot!).getByText(label, { selector: 'dt' });
@@ -22,7 +26,8 @@ describe('ScenarioDashboard', () => {
     expect(screen.getByRole('heading', { name: 'Scenario controls' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Campus road stage' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Progress' })).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Snapshot preview' })).toBeVisible();
+    expect(screen.getByText('Scenario snapshot details')).toBeVisible();
+    expect(screen.getByText('Snapshot preview')).not.toBeVisible();
     expect(screen.getByRole('heading', { name: 'Presentation events' })).toBeVisible();
     expect(screen.getByRole('progressbar', { name: 'Scenario progress' })).toHaveAttribute(
       'aria-valuenow',
@@ -35,10 +40,10 @@ describe('ScenarioDashboard', () => {
     expect(screen.getByRole('button', { name: 'Start' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Step +1s' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled();
-    expect(screen.getByText('UNAVAILABLE')).toBeVisible();
+    expect(screen.getByText('UNAVAILABLE')).not.toBeVisible();
     expect(screen.getAllByText(/SIMULATED/)).toHaveLength(5);
     expect(screen.queryByText('GOOD')).not.toBeInTheDocument();
-    expect(screen.getByText(/Select a simulated scenario to create/i)).toBeVisible();
+    expect(screen.getByText(/Select a simulated scenario to create/i)).not.toBeVisible();
   });
 
   it('places the stage before progress and preserves the snapshot preview', () => {
@@ -47,7 +52,7 @@ describe('ScenarioDashboard', () => {
     const progress = screen.getByRole('heading', { name: 'Progress' }).closest('section');
 
     expect(stage.compareDocumentPosition(progress!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(screen.getByRole('heading', { name: 'Snapshot preview' })).toBeVisible();
+    expect(screen.getByText('Snapshot preview')).not.toBeVisible();
   });
 
   it('updates the stage from deterministic left-to-right controller steps', () => {
