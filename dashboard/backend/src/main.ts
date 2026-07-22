@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module.js';
 import { loadEnvironment } from './common/config/environment.js';
+import { configureRealtimeWebSocketAdapter } from './realtime/transport/realtime-ws-adapter.js';
 
 async function bootstrap(): Promise<void> {
   const environment = loadEnvironment();
@@ -13,6 +14,7 @@ async function bootstrap(): Promise<void> {
   app.enableCors({
     origin: environment.corsOrigins,
   });
+  configureRealtimeWebSocketAdapter(app, environment);
   app.enableShutdownHooks();
 
   await app.listen(environment.port, environment.host);

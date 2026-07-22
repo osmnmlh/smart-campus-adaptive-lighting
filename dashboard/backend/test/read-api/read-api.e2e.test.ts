@@ -6,6 +6,8 @@ import request from 'supertest';
 
 import { AppModule } from '../../src/app.module.js';
 import { ReadModelInvalidError } from '../../src/common/http/api-errors.js';
+import { loadEnvironment } from '../../src/common/config/environment.js';
+import { configureRealtimeWebSocketAdapter } from '../../src/realtime/transport/realtime-ws-adapter.js';
 
 interface ResponseMeta {
   total?: number;
@@ -54,6 +56,7 @@ describe('deterministic read API e2e', () => {
       controllers: [ThrowingController],
     }).compile();
     app = moduleReference.createNestApplication();
+    configureRealtimeWebSocketAdapter(app, loadEnvironment({ NODE_ENV: 'test' }));
     await app.init();
   });
 

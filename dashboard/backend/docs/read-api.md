@@ -45,7 +45,9 @@ and runtime input parsing; application services own filtering, stable sorting, p
 response metadata.
 
 This is an open development read API, not a production-ready service. The frontend does not yet
-call it. PostgreSQL, MQTT, WebSocket, persistence, authentication, authorization, alert
-acknowledgement/resolution, and every write or scenario-command endpoint remain intentionally
-absent. Process restarts provide no persistence guarantee, and all records are simulated rather
-than live telemetry, production incidents, or production audit history.
+call it. A companion native WebSocket endpoint at `/ws/v1` reuses the same canonical snapshot;
+its protocol is documented in `docs/architecture/websocket-realtime-protocol.md`. PostgreSQL,
+MQTT ingestion, persistence, authentication, authorization, alert acknowledgement/resolution,
+and every write or scenario-command endpoint remain intentionally absent. Process restarts
+provide no persistence guarantee, and all records are simulated rather than live telemetry,
+production incidents, or production audit history.
