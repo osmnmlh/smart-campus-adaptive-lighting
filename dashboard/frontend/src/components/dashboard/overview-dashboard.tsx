@@ -29,7 +29,7 @@ export function OverviewDashboard({ model, errorMessage = null }: OverviewDashbo
       <SummaryGrid model={model} />
       <NodeStatusList nodes={model.nodes} />
       <div className="overview-split-grid">
-        <LampStatusSummary lamps={model.lamps} />
+        <LampStatusSummary lamps={model.lamps} dataSource={model.dataSource} />
         <SensorStatusSummary sensors={model.sensors} />
       </div>
       <AlertSummary alerts={model.alerts} summary={model.summary} />
