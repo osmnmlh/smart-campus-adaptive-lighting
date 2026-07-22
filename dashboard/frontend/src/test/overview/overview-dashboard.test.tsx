@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { OverviewDashboard } from '@/components/dashboard/overview-dashboard';
 import { createOverviewModel } from '@/features/overview/overview-adapter';
 import { overviewSnapshot } from '@/features/overview/overview-fixture';
@@ -24,23 +24,24 @@ describe('OverviewDashboard', () => {
     expect(screen.getByRole('heading', { name: 'Operational summary' })).toBeVisible();
     expect(screen.getByLabelText('Nodes summary')).toHaveTextContent('3');
     expect(screen.getByLabelText('Lamps summary')).toHaveTextContent('1 active');
-    expect(screen.getByLabelText('Sensors summary')).toHaveTextContent('6 healthy');
     expect(screen.getByLabelText('Active Alerts summary')).toHaveTextContent('WARNING');
-    expect(screen.getByLabelText('Node status list')).toBeVisible();
-    expect(screen.getByLabelText('Lamp status summary')).toBeVisible();
-    expect(screen.getByLabelText('Sensor status summary')).toBeVisible();
     expect(screen.getByLabelText('Active alert summary')).toBeVisible();
+    expect(screen.getAllByRole('article')).toHaveLength(5);
+    expect(screen.getByText('Infrastructure details').closest('details')).not.toHaveAttribute(
+      'open',
+    );
   });
 
   it('shows five lamps with separate health, state, and percentage fields', () => {
     render(<OverviewDashboard model={model} />);
+    fireEvent.click(screen.getByText('Lighting and sensor details').closest('summary')!);
     const lamps = within(screen.getByLabelText('Lamp status summary'));
 
     expect(lamps.getAllByRole('listitem')).toHaveLength(5);
     expect(lamps.getByRole('heading', { name: 'L2' })).toBeVisible();
     expect(lamps.getByText('Active')).toBeVisible();
     expect(lamps.getAllByText('Healthy')).toHaveLength(5);
-    expect(lamps.getAllByText('100%').length).toBeGreaterThanOrEqual(3);
+    expect(lamps.getAllByText('100%')).toHaveLength(2);
     expect(lamps.getAllByText('Target brightness')).toHaveLength(5);
     expect(lamps.getAllByText('PWM duty percent')).toHaveLength(5);
     expect(lamps.queryByText(/^pwmDuty$/)).not.toBeInTheDocument();
@@ -48,6 +49,7 @@ describe('OverviewDashboard', () => {
 
   it('shows six sensors without inventing a direction result for IR3', () => {
     render(<OverviewDashboard model={model} />);
+    fireEvent.click(screen.getByText('Lighting and sensor details').closest('summary')!);
     const sensors = within(screen.getByLabelText('Sensor status summary'));
 
     expect(sensors.getAllByRole('listitem')).toHaveLength(6);

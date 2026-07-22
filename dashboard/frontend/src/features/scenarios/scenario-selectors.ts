@@ -54,6 +54,8 @@ export const selectSnapshotPreview = (
     totalSensorCount: 6,
     activeSensorCount: state.activeSensorIds.length,
     activeSensorIds: [...state.activeSensorIds],
+    offlineNodeIds: [...state.offlineNodeIds],
+    lamps: state.lamps.map((lamp) => ({ ...lamp })),
     activeAlertCount: state.offlineNodeIds.length,
     source: DataSource.SIMULATED,
     quality: MetricQuality.GOOD,

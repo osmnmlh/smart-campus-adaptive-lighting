@@ -80,6 +80,8 @@ export type ScenarioSnapshotPreview = Readonly<{
   totalSensorCount: number;
   activeSensorCount: number;
   activeSensorIds: readonly string[];
+  offlineNodeIds: readonly string[];
+  lamps: readonly ScenarioLampState[];
   activeAlertCount: number;
   source: DataSource;
   quality: MetricQuality;
