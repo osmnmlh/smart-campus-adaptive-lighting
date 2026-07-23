@@ -197,6 +197,8 @@ bool start_mqtt() {
   esp_mqtt_client_config_t config{};
   config.uri = SC_MQTT_URI;
   config.client_id = "GW_1";
+  config.username = SC_MQTT_USERNAME[0] == '\0' ? nullptr : SC_MQTT_USERNAME;
+  config.password = SC_MQTT_PASSWORD[0] == '\0' ? nullptr : SC_MQTT_PASSWORD;
   config.lwt_topic = gateway_config::kStatusTopic;
   config.lwt_msg = last_will_json.c_str();
   config.lwt_msg_len = last_will_json.length();

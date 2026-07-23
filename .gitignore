@@ -48,6 +48,8 @@ firmware/**/coverage/
 firmware/**/test-output/
 firmware/**/gateway_secrets.hpp
 firmware/**/node_secrets.hpp
+firmware/integration/gateway-local.hpp
+firmware/integration/node-peers.hpp
 firmware/**/*.bin
 firmware/**/*.elf
 firmware/**/*.map
