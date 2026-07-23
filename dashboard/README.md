@@ -753,10 +753,17 @@ DATABASE_NAME=
 DATABASE_USER=
 DATABASE_PASSWORD=
 
-MQTT_HOST=
-MQTT_PORT=
+MQTT_ENABLED=false
+MQTT_BROKER_URL=mqtt://127.0.0.1:1883
+MQTT_CLIENT_ID=smart-campus-backend
 MQTT_USERNAME=
 MQTT_PASSWORD=
+MQTT_CONNECT_TIMEOUT_MS=5000
+MQTT_RECONNECT_PERIOD_MS=1000
+MQTT_KEEPALIVE_SECONDS=30
+MQTT_MAX_PAYLOAD_BYTES=16384
+MQTT_DEDUP_CAPACITY=10000
+MQTT_LIVENESS_SWEEP_MS=5000
 
 WEBSOCKET_URL=
 NEXT_PUBLIC_API_URL=
@@ -768,6 +775,11 @@ JWT_EXPIRES_IN=
 MOCK_SCENARIO_ENABLED=
 MOCK_SCENARIO_INTERVAL=
 ```
+
+Backend MQTT ingestion is read-only and disabled by default. When enabled, it subscribes only to
+`smart-campus/v1/nodes/+/+` and `smart-campus/v1/gateways/+/status` at QoS 1. Validation,
+deduplication, ordering, liveness, read-model updates, and normalized native WebSocket delivery are
+documented in `docs/architecture/mqtt-ingestion-pipeline.md`.
 
 ---
 

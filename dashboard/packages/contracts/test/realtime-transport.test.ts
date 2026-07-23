@@ -3,7 +3,9 @@ import {
   PingMessageV1Schema,
   REALTIME_PROTOCOL_VERSION,
   RealtimeClientMessageV1Schema,
+  RealtimeConnectionStateV1Schema,
   RealtimeCursorSchema,
+  RealtimeDataModeSchema,
   RealtimeDomainEventDraftV1Schema,
   RealtimeDomainEventV1Schema,
   RealtimeProtocolVersionSchema,
@@ -46,6 +48,14 @@ const log = {
   message: 'System mode changed',
   metadata: {},
 };
+const connectionState = {
+  dataMode: 'LIVE',
+  mqttEnabled: true,
+  brokerConnected: true,
+  gatewayStatus: 'ONLINE',
+  onlineNodeIds: ['NODE_1', 'NODE_2', 'NODE_3'],
+  changedAt: timestamp,
+} as const;
 
 const eventDrafts = [
   { eventType: 'SYSTEM_SNAPSHOT_UPDATED', payload: systemSnapshot },
@@ -54,6 +64,7 @@ const eventDrafts = [
   { eventType: 'SENSOR_UPDATED', payload: sensorSnapshot },
   { eventType: 'ALERT_UPSERTED', payload: alert },
   { eventType: 'LOG_APPENDED', payload: log },
+  { eventType: 'SYSTEM_CONNECTION_UPDATED', payload: connectionState },
 ] as const;
 
 const eventFrom = (draft: (typeof eventDrafts)[number]) => ({
@@ -112,6 +123,50 @@ describe('realtime primitive contracts', () => {
       expect(RealtimeRequestIdSchema.safeParse(value).success).toBe(false);
     },
   );
+});
+
+describe('realtime MQTT connection contracts', () => {
+  it.each(['SIMULATED', 'DISCONNECTED', 'DEGRADED', 'LIVE'] as const)(
+    'accepts additive data mode %s',
+    (mode) => expect(RealtimeDataModeSchema.parse(mode)).toBe(mode),
+  );
+
+  it.each(['UNKNOWN', 'OFFLINE', 'BROKEN', '', null])('rejects invalid data mode %j', (mode) => {
+    expect(RealtimeDataModeSchema.safeParse(mode).success).toBe(false);
+  });
+
+  it('accepts and round-trips the typed live connection state', () => {
+    const parsed = RealtimeConnectionStateV1Schema.parse(
+      JSON.parse(JSON.stringify(connectionState)),
+    );
+    expect(parsed).toEqual(connectionState);
+  });
+
+  it('rejects duplicate online node identifiers', () => {
+    expect(
+      RealtimeConnectionStateV1Schema.safeParse({
+        ...connectionState,
+        onlineNodeIds: ['NODE_1', 'NODE_1'],
+      }).success,
+    ).toBe(false);
+  });
+
+  it('rejects unknown connection-state fields', () => {
+    expect(
+      RealtimeConnectionStateV1Schema.safeParse({ ...connectionState, rawBrokerUrl: 'secret' })
+        .success,
+    ).toBe(false);
+  });
+
+  it.each([
+    { ...connectionState, dataMode: 'DEGRADED' },
+    { ...connectionState, mqttEnabled: false, dataMode: 'LIVE' },
+    { ...connectionState, brokerConnected: false, dataMode: 'LIVE' },
+    { ...connectionState, gatewayStatus: 'OFFLINE', dataMode: 'LIVE' },
+    { ...connectionState, onlineNodeIds: ['NODE_1', 'NODE_2'], dataMode: 'LIVE' },
+  ])('rejects a connection state with inconsistent data-mode semantics %#', (state) => {
+    expect(RealtimeConnectionStateV1Schema.safeParse(state).success).toBe(false);
+  });
 });
 
 describe('realtime domain event contracts', () => {
@@ -241,18 +296,21 @@ describe('realtime server message contracts', () => {
     expect(RealtimeServerMessageV1Schema.safeParse(message).success).toBe(true);
   });
 
-  it('rejects a non-simulated ready data mode', () => {
-    expect(
-      RealtimeServerMessageV1Schema.safeParse({
-        messageType: 'SERVER_READY',
-        protocolVersion: 1,
-        streamId,
-        cursor: 0,
-        serverTime: timestamp,
-        dataMode: 'LIVE',
-      }).success,
-    ).toBe(false);
-  });
+  it.each(['SIMULATED', 'DISCONNECTED', 'DEGRADED', 'LIVE'] as const)(
+    'accepts SERVER_READY data mode %s',
+    (dataMode) => {
+      expect(
+        RealtimeServerMessageV1Schema.safeParse({
+          messageType: 'SERVER_READY',
+          protocolVersion: 1,
+          streamId,
+          cursor: 0,
+          serverTime: timestamp,
+          dataMode,
+        }).success,
+      ).toBe(true);
+    },
+  );
 
   it('rejects error details that could leak internals', () => {
     expect(

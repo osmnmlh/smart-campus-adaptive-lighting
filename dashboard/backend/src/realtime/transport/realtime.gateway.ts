@@ -12,8 +12,10 @@ import WebSocket, { type RawData } from 'ws';
 
 import {
   REALTIME_CLOCK,
+  REALTIME_DATA_MODE,
   REALTIME_PUBLISHER,
   type RealtimeClock,
+  type RealtimeDataModePort,
   type RealtimePublisherPort,
 } from '../domain/realtime-ports.js';
 import { RealtimeSnapshotService } from '../application/realtime-snapshot.service.js';
@@ -31,6 +33,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     @Inject(REALTIME_PUBLISHER) private readonly publisher: RealtimePublisherPort,
     private readonly snapshotService: RealtimeSnapshotService,
     @Inject(REALTIME_CLOCK) private readonly clock: RealtimeClock,
+    @Inject(REALTIME_DATA_MODE) private readonly dataMode: RealtimeDataModePort,
   ) {}
 
   handleConnection(client: WebSocket): void {
@@ -57,7 +60,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       streamId: this.publisher.getStreamId(),
       cursor: this.publisher.getCurrentCursor(),
       serverTime: this.clock.now(),
-      dataMode: 'SIMULATED',
+      dataMode: this.dataMode.getDataMode(),
     });
     this.sendSnapshot(client);
   }
@@ -145,7 +148,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       streamId: this.publisher.getStreamId(),
       cursor: this.publisher.getCurrentCursor(),
       sentAt: this.clock.now(),
-      dataMode: 'SIMULATED',
+      dataMode: this.dataMode.getDataMode(),
       snapshot: this.snapshotService.getCurrentSnapshot(),
     });
   }
