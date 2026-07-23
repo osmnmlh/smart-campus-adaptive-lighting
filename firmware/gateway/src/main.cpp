@@ -6,6 +6,7 @@
 #include <mqtt_client.h>
 
 #include <array>
+#include <cstring>
 #include <ctime>
 
 #include "gateway_config.hpp"
