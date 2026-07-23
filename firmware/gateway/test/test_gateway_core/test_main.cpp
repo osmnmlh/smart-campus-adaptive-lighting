@@ -46,7 +46,7 @@ WireMessage heartbeat(NodeId node = NodeId::NODE_1, std::uint32_t sequence = 1) 
 }
 WireMessage sensor(NodeId node, SensorId id) {
   return {node, MessageType::SENSOR_EVENT, 7, 2, 1240,
-          SensorEventPayload{id, SensorState::ACTIVE, SensorEdge::RISING, 1239}};
+          SensorEventPayload{id, SensorState::ACTIVE, SensorEdge::RISING_EDGE, 1239}};
 }
 WireMessage lamp(NodeId node, LampId id) {
   return {node, MessageType::LAMP_STATE, 7, 3, 1250,

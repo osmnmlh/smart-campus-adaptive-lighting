@@ -64,7 +64,7 @@ CodecError validate(const WireMessage& message) {
       const auto* value = std::get_if<SensorEventPayload>(&message.payload);
       if (value == nullptr || value->sensor_id < SensorId::IR1 ||
           value->sensor_id > SensorId::IR5 ||
-          value->state > SensorState::ACTIVE || value->edge > SensorEdge::FALLING)
+          value->state > SensorState::ACTIVE || value->edge > SensorEdge::FALLING_EDGE)
         return CodecError::INVALID_PAYLOAD;
       return owns_sensor(message.node_id, value->sensor_id)
                  ? CodecError::NONE

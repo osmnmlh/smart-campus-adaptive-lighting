@@ -17,7 +17,7 @@ enum class MessageType : std::uint8_t {
   ELECTRICAL_MEASUREMENT = 4,
 };
 enum class SensorState : std::uint8_t { INACTIVE = 0, ACTIVE = 1 };
-enum class SensorEdge : std::uint8_t { NONE = 0, RISING = 1, FALLING = 2 };
+enum class SensorEdge : std::uint8_t { NONE = 0, RISING_EDGE = 1, FALLING_EDGE = 2 };
 enum class LampOperatingState : std::uint8_t {
   OFF = 0,
   STANDBY = 1,

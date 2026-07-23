@@ -132,7 +132,7 @@ bool serialize_envelope(const gateway_core::AcceptedFrame& frame,
         value->state == smart_campus::SensorState::ACTIVE ? "ACTIVE" : "INACTIVE";
     if (value->edge != smart_campus::SensorEdge::NONE)
       payload["edge"] =
-          value->edge == smart_campus::SensorEdge::RISING ? "RISING" : "FALLING";
+          value->edge == smart_campus::SensorEdge::RISING_EDGE ? "RISING" : "FALLING";
     payload["eventUptimeMs"] = value->event_uptime_ms;
   } else if (const auto* value =
                  std::get_if<smart_campus::LampStatePayload>(&message.payload)) {
