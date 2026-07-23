@@ -378,7 +378,7 @@ void service_inputs(std::uint32_t now_ms) {
         node_config::kIrActiveHigh ? pin_high : !pin_high;
     if (debouncers[index].update(active, now_ms,
                                   node_config::kDebounceMs) ==
-        node_core::DebounceEvent::RISING) {
+        node_core::DebounceEvent::BECAME_ACTIVE) {
       lighting.on_local_sensor(profile.sensors[index].id, now_ms);
       enqueue_sensor_event(profile.sensors[index].id, now_ms);
     }

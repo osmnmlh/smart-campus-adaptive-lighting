@@ -18,7 +18,7 @@ class SequenceCounter {
   std::uint32_t current_{0};
 };
 
-enum class DebounceEvent { NONE, RISING, FALLING };
+enum class DebounceEvent { NONE, BECAME_ACTIVE, BECAME_INACTIVE };
 
 class DebouncedInput {
  public:

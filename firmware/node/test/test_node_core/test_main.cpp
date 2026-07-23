@@ -159,7 +159,7 @@ void test_debounce_emits_one_rising_edge() {
                     input.update(true, 100, 50));
   TEST_ASSERT_EQUAL(node_core::DebounceEvent::NONE,
                     input.update(true, 149, 50));
-  TEST_ASSERT_EQUAL(node_core::DebounceEvent::RISING,
+  TEST_ASSERT_EQUAL(node_core::DebounceEvent::BECAME_ACTIVE,
                     input.update(true, 150, 50));
   TEST_ASSERT_EQUAL(node_core::DebounceEvent::NONE,
                     input.update(true, 250, 50));
@@ -169,7 +169,7 @@ void test_debounce_emits_falling_after_stability() {
   node_core::DebouncedInput input(true);
   TEST_ASSERT_EQUAL(node_core::DebounceEvent::NONE,
                     input.update(false, 10, 50));
-  TEST_ASSERT_EQUAL(node_core::DebounceEvent::FALLING,
+  TEST_ASSERT_EQUAL(node_core::DebounceEvent::BECAME_INACTIVE,
                     input.update(false, 60, 50));
 }
 
@@ -185,7 +185,7 @@ void test_debounce_rejects_a_short_glitch() {
 void test_debounce_handles_millis_rollover() {
   node_core::DebouncedInput input;
   input.update(true, std::numeric_limits<std::uint32_t>::max() - 20U, 50);
-  TEST_ASSERT_EQUAL(node_core::DebounceEvent::RISING,
+  TEST_ASSERT_EQUAL(node_core::DebounceEvent::BECAME_ACTIVE,
                     input.update(true, 30, 50));
 }
 

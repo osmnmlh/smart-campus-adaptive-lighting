@@ -33,7 +33,8 @@ DebounceEvent DebouncedInput::update(bool active, std::uint32_t now_ms,
   if (candidate_ == stable_ || now_ms - candidate_since_ms_ < debounce_ms)
     return DebounceEvent::NONE;
   stable_ = candidate_;
-  return stable_ ? DebounceEvent::RISING : DebounceEvent::FALLING;
+  return stable_ ? DebounceEvent::BECAME_ACTIVE
+                 : DebounceEvent::BECAME_INACTIVE;
 }
 
 std::uint8_t brightness_to_pwm(std::uint8_t brightness_percent,
