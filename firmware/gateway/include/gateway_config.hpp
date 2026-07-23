@@ -18,11 +18,21 @@
 #define SC_WIFI_SSID "SC_LAB_REPLACE_ME"
 #define SC_WIFI_PASSWORD "SC_LAB_REPLACE_ME"
 #define SC_MQTT_URI "mqtt://192.0.2.1:1883"
+#define SC_MQTT_USERNAME ""
+#define SC_MQTT_PASSWORD ""
 #define SC_NODE_1_MAC_BYTES {0x02, 0x00, 0x00, 0x00, 0x00, 0x01}
 #define SC_NODE_2_MAC_BYTES {0x02, 0x00, 0x00, 0x00, 0x00, 0x02}
 #define SC_NODE_3_MAC_BYTES {0x02, 0x00, 0x00, 0x00, 0x00, 0x03}
 #else
 #error "Define SC_LAB_BUILD or SC_FIELD_BUILD"
+#endif
+
+#ifndef SC_MQTT_USERNAME
+#define SC_MQTT_USERNAME ""
+#endif
+
+#ifndef SC_MQTT_PASSWORD
+#define SC_MQTT_PASSWORD ""
 #endif
 
 namespace gateway_config {

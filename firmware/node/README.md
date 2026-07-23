@@ -12,11 +12,11 @@ Override `SC_IR_ACTIVE_HIGH` or `SC_PWM_ACTIVE_HIGH` at build time when the elec
 interface is inverted. PWM uses independent LEDC channels at 5 kHz with 8-bit
 resolution.
 
-| Environment | Node | Inputs | Lamp PWM outputs | I2C |
+| CI / field environment | Node | Inputs | Lamp PWM outputs | I2C |
 | --- | --- | --- | --- | --- |
-| `node1-ci` | `NODE_1` | IR1 GPIO25, IR2 GPIO26 | L1 GPIO32/ch0, L2 GPIO33/ch1 | none |
-| `node2-ci` | `NODE_2` | IR3 GPIO25 | L3 GPIO32/ch2 | SDA21, SCL22 |
-| `node3-ci` | `NODE_3` | IR4 GPIO25, IR5 GPIO26 | L4 GPIO32/ch3, L5 GPIO33/ch4 | none |
+| `node1-ci` / `node1-field` | `NODE_1` | IR1 GPIO25, IR2 GPIO26 | L1 GPIO32/ch0, L2 GPIO33/ch1 | none |
+| `node2-ci` / `node2-field` | `NODE_2` | IR3 GPIO25 | L3 GPIO32/ch2 | SDA21, SCL22 |
+| `node3-ci` / `node3-field` | `NODE_3` | IR4 GPIO25, IR5 GPIO26 | L4 GPIO32/ch3, L5 GPIO33/ch4 | none |
 
 `NODE_2` alone initializes the BH1750 ambient sensor and the INA219 measurement point
 named `INA219_1`. The INA219 represents L3 only. Its emitted electrical values use the
@@ -66,7 +66,8 @@ placeholder MAC addresses and unencrypted ESP-NOW peers. Do not deploy that mode
 Field mode requires static per-device MAC provisioning, one PMK, and per-peer LMKs.
 Copy `include/node_secrets.example.hpp` to the ignored
 `include/node_secrets.hpp` on a provisioning workstation and replace every
-placeholder. The example values are not secrets and are not deployable.
+placeholder. The example values are not secrets and are not deployable. Field
+profiles deliberately fail to compile when that ignored file is absent.
 
 ## Build and test
 
@@ -82,4 +83,5 @@ From the repository root:
 These commands test and compile only. They do not flash a board and do not open a
 serial port. Hardware flashing, actual MAC/key provisioning, pin electrical
 validation, sensor calibration, and end-to-end radio tests remain explicit field
-steps.
+steps. Manual field upload commands are in
+`dashboard/docs/integration/hardware-mvp-bring-up.md`.

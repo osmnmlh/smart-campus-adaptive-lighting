@@ -54,6 +54,12 @@ reconstructed from current UTC minus monotonic time elapsed since callback arriv
 the firmware never publishes epoch/1970 placeholders. `ONLINE` requires Wi-Fi,
 channel alignment, ESP-NOW, all peers, UTC, and MQTT.
 
+The field header supplies the complete broker URI plus optional username/password;
+the broker host and port are not compiled as production constants. Empty credentials
+remain available only for controlled loopback/LAN labs. Internet deployments require
+authentication, topic ACLs, and verified TLS. The current firmware does not complete
+TLS certificate verification, so an `mqtts://` URI alone is not production readiness.
+
 Node messages use QoS 1 and are non-retained. Only the retained gateway birth/status
 and retained `OFFLINE` Last Will use the gateway status topic. The LWT timestamp is
 the time the will payload is prepared; it does not claim to be the later disconnect
@@ -68,3 +74,6 @@ after the initial attempt. Topic, JSON payload, node identity, gateway sequence,
 
 Logs report only coarse state/rejection categories. They never print credentials,
 key bytes, full MAC addresses, raw wire payloads, or MQTT JSON bodies.
+
+Manual provisioning and upload order are documented in
+`dashboard/docs/integration/hardware-mvp-bring-up.md`.
