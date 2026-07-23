@@ -20,6 +20,7 @@ import {
   SCENARIO_READ_REPOSITORY,
   SNAPSHOT_READ_REPOSITORY,
 } from './domain/read-repositories.js';
+import { LIVE_READ_MODEL_UPDATE } from './domain/live-read-model-update.port.js';
 import { DeterministicReadFixture } from './infrastructure/in-memory/deterministic-read-fixture.js';
 import {
   InMemoryAlertReadRepository,
@@ -27,6 +28,7 @@ import {
   InMemoryScenarioReadRepository,
   InMemorySnapshotReadRepository,
 } from './infrastructure/in-memory/in-memory-read-repositories.js';
+import { InMemoryLiveReadModelUpdateAdapter } from './infrastructure/in-memory/in-memory-live-read-model-update.adapter.js';
 
 @Module({
   imports: [ScenariosModule],
@@ -42,10 +44,12 @@ import {
     InMemoryAlertReadRepository,
     InMemoryLogReadRepository,
     InMemoryScenarioReadRepository,
+    InMemoryLiveReadModelUpdateAdapter,
     { provide: SNAPSHOT_READ_REPOSITORY, useExisting: InMemorySnapshotReadRepository },
     { provide: ALERT_READ_REPOSITORY, useExisting: InMemoryAlertReadRepository },
     { provide: LOG_READ_REPOSITORY, useExisting: InMemoryLogReadRepository },
     { provide: SCENARIO_READ_REPOSITORY, useExisting: InMemoryScenarioReadRepository },
+    { provide: LIVE_READ_MODEL_UPDATE, useExisting: InMemoryLiveReadModelUpdateAdapter },
     GetSystemSnapshotService,
     ListAlertsService,
     GetAlertService,
@@ -60,6 +64,8 @@ import {
     InMemoryAlertReadRepository,
     InMemoryLogReadRepository,
     InMemoryScenarioReadRepository,
+    InMemoryLiveReadModelUpdateAdapter,
+    LIVE_READ_MODEL_UPDATE,
     GetSystemSnapshotService,
     ListAlertsService,
     GetAlertService,

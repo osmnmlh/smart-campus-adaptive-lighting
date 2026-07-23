@@ -7,6 +7,7 @@ import {
   RealtimeRequestIdSchema,
   RealtimeStreamIdSchema,
 } from './realtime-common.schema.js';
+import { RealtimeDataModeSchema } from './realtime-connection.schema.js';
 import { RealtimeDomainEventV1Schema } from './realtime-domain-event.schema.js';
 
 const protocolEnvelope = {
@@ -36,7 +37,7 @@ export const ServerReadyMessageV1Schema = z
     streamId: RealtimeStreamIdSchema,
     cursor: RealtimeCursorSchema,
     serverTime: UtcTimestampSchema,
-    dataMode: z.literal('SIMULATED'),
+    dataMode: RealtimeDataModeSchema,
   })
   .strict();
 
@@ -47,7 +48,7 @@ export const SystemSnapshotMessageV1Schema = z
     streamId: RealtimeStreamIdSchema,
     cursor: RealtimeCursorSchema,
     sentAt: UtcTimestampSchema,
-    dataMode: z.literal('SIMULATED'),
+    dataMode: RealtimeDataModeSchema,
     snapshot: SystemSnapshotSchema,
   })
   .strict();
