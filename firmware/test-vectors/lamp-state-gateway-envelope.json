@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "gatewayId": "GW_1",
+  "gatewayBootId": "BOOT_00000007",
+  "gatewaySequence": 3,
+  "receivedAt": "2026-07-23T08:00:02.000Z",
+  "messageId": "NODE_2:BOOT_00000007:3",
+  "nodeMessage": {
+    "schemaVersion": 1,
+    "nodeId": "NODE_2",
+    "bootId": "BOOT_00000007",
+    "sequence": 3,
+    "uptimeMs": 7000,
+    "messageType": "LAMP_STATE",
+    "payload": {
+      "lampId": "L3",
+      "operatingState": "STANDBY",
+      "health": "HEALTHY",
+      "brightnessPercent": 30,
+      "targetBrightnessPercent": 30,
+      "pwmDutyPercent": 30
+    }
+  }
+}

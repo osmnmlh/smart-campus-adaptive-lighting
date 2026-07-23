@@ -6,7 +6,7 @@ basic fault monitoring.
 
 ## Project Status
 
-Current phase: Hardware and single-node validation.
+Current phase: ESP32 gateway firmware foundation and hardware validation.
 
 ## MVP Scope
 

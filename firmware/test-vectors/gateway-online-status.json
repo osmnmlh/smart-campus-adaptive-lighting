@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "gatewayId": "GW_1",
+  "gatewayBootId": "BOOT_00000007",
+  "status": "ONLINE",
+  "uptimeMs": 9000,
+  "communicationChannel": 6,
+  "firmwareVersion": "1.0.0",
+  "publishedAt": "2026-07-23T08:00:04.000Z",
+  "transportSource": "GATEWAY"
+}

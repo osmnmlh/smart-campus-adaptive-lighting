@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "gatewayId": "GW_1",
+  "gatewayBootId": "BOOT_00000007",
+  "gatewaySequence": 4,
+  "receivedAt": "2026-07-23T08:00:03.000Z",
+  "messageId": "NODE_2:BOOT_00000007:4",
+  "nodeMessage": {
+    "schemaVersion": 1,
+    "nodeId": "NODE_2",
+    "bootId": "BOOT_00000007",
+    "sequence": 4,
+    "uptimeMs": 8000,
+    "messageType": "ELECTRICAL_MEASUREMENT",
+    "payload": {
+      "sensorId": "INA219_1",
+      "scopeType": "LAMP",
+      "scopeId": "L3",
+      "voltageV": 12,
+      "currentA": 0.5,
+      "powerW": 6,
+      "energyWh": 1.25,
+      "dataSource": "MEASURED"
+    }
+  }
+}

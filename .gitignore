@@ -38,6 +38,18 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.venv-firmware/
+.toolchains/
+
+# PlatformIO and firmware-local outputs
+.pio/
+firmware/**/.pio/
+firmware/**/coverage/
+firmware/**/test-output/
+firmware/**/gateway_secrets.hpp
+firmware/**/*.bin
+firmware/**/*.elf
+firmware/**/*.map
 
 # Large/raw video files
 media/demo-video/raw/

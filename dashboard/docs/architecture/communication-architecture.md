@@ -1,7 +1,7 @@
 # Communication architecture freeze
 
-Status: Accepted
-Date: 2026-07-22
+Status: Implemented through gateway firmware foundation
+Date: 2026-07-23
 
 ## Scope and flow
 
@@ -64,6 +64,32 @@ The single INA219 is connected to `NODE_2`/`L3`. Its `voltageV`, `currentA`, `po
 
 The node-origin target is 220 UTF-8 bytes. Canonical logical JSON examples measure 177 bytes for heartbeat, 198 for sensor events, 259 for lamp state, and 275 for electrical measurement. Lamp and electrical JSON therefore exceed the target; firmware must use compact field mapping or another reviewed serialization without changing logical contract meaning. The tests report real byte counts rather than hiding this gap. CBOR/Protobuf/binary codecs are not added, and the larger MQTT envelope is outside this limit.
 
+## Gateway firmware implementation boundary
+
+The gateway foundation now implements a real compile-time ESP32 path using Arduino,
+ESP-NOW, Wi-Fi/SNTP, and the ESP-IDF MQTT client. The receive callback is copy-only
+and bounded; portable core code performs allowlist, source-node, wire-version,
+payload, ownership, CRC, and queue validation. A valid accepted frame receives the
+next gateway sequence only after queue capacity is confirmed.
+
+The binary wire protocol is explicitly little-endian and capped at 220 bytes. It
+uses typed heartbeat, sensor, lamp, and measured-electrical payloads with a trailing
+IEEE CRC-32. Firmware-generated MQTT JSON preserves the V1 logical contract and is
+covered by package-root TypeScript schema fixtures. Gateway JSON output is capped at
+1,024 bytes and status JSON at 512 bytes.
+
+The gateway outbox is bounded to 64 immutable entries, prioritizes sensor, lamp,
+electrical, then heartbeat, publishes QoS 1, and removes only the PUBACK-matched
+entry. Three retries beyond the initial attempt are allowed. Node topics are never
+retained; gateway birth and LWT remain retained. There are no subscriptions.
+
+Lab builds are explicitly unencrypted and non-deployable. Field builds require an
+ignored local secrets header, static PMK, one LMK per peer, exactly three allowlisted
+MAC addresses, and matching node identities. No real MAC or key value is committed.
+
 ## Out of scope
 
-No real MQTT client/Mosquitto connection, WebSocket, firmware, ESP-NOW code, Wi-Fi reconnect, actual PMK/LMK provisioning, dynamic rotation, authentication, authorization, device commands, PostgreSQL, full anti-replay, certificates, OTA, energy analytics UI, or vehicle/person/bicycle classification is implemented.
+Real broker/hardware execution, actual PMK/LMK provisioning, dynamic key rotation,
+authentication, authorization, device commands, PostgreSQL, full anti-replay,
+certificates, OTA, energy analytics UI, and vehicle/person/bicycle classification
+remain out of scope.
