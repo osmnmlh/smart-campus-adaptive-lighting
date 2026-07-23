@@ -1,8 +1,9 @@
 # Firmware workspace
 
-This directory contains the existing node sketch placeholder and the portable gateway
-foundation. The gateway is a fourth ESP32 (`GW_1`); no lighting node doubles as the
-gateway.
+This directory contains the portable gateway foundation and the common three-profile
+lighting-node firmware. The gateway is a fourth ESP32 (`GW_1`); no lighting node
+doubles as the gateway. The old `smart_lighting_node` sketch remains only as historical
+prototype material; `node/` is the canonical node firmware.
 
 ## Reproducible toolchain
 
@@ -31,11 +32,17 @@ The compiler is a local test dependency and is never committed.
 ```powershell
 .\.venv-firmware\Scripts\pio.exe test -d firmware/gateway -e native
 .\.venv-firmware\Scripts\pio.exe run -d firmware/gateway -e esp32dev-ci
+.\.venv-firmware\Scripts\pio.exe test -d firmware/node -e native
+.\.venv-firmware\Scripts\pio.exe run -d firmware/node -e node1-ci
+.\.venv-firmware\Scripts\pio.exe run -d firmware/node -e node2-ci
+.\.venv-firmware\Scripts\pio.exe run -d firmware/node -e node3-ci
 ```
 
 These commands compile and test only. They do not flash a board or open a serial port.
 Field mode deliberately fails to compile until the ignored
-`firmware/gateway/include/gateway_secrets.hpp` has been provisioned.
+`firmware/gateway/include/gateway_secrets.hpp` or
+`firmware/node/include/node_secrets.hpp` has been provisioned for the selected
+project.
 
 The compact ESP-NOW wire frames, including CRC, are 28 bytes for heartbeat, 31 bytes
 for sensor events, 30 bytes for lamp state, and 40 bytes for electrical measurements.
