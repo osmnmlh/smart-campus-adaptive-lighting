@@ -54,7 +54,7 @@ describe('ScenarioStage', () => {
     const sensors = container.querySelectorAll('[data-sensor-id]');
     expect(sensors).toHaveLength(5);
     sensors.forEach((sensor) => expect(sensor).toHaveAttribute('data-active', 'false'));
-    expect(screen.getAllByText(/IR[1-5] · INACTIVE/)).toHaveLength(5);
+    expect(screen.getAllByText(/IR[1-5] · Inactive/)).toHaveLength(5);
   });
 
   it('renders an active IR sensor without classifying the moving subject', () => {
@@ -65,7 +65,7 @@ describe('ScenarioStage', () => {
       'data-active',
       'true',
     );
-    expect(screen.getByText('IR2 · ACTIVE')).toBeVisible();
+    expect(screen.getByText('IR2 · Active')).toBeVisible();
     expect(container.textContent).not.toMatch(/vehicle|person|pedestrian|cyclist|bicycle/i);
   });
 
@@ -77,7 +77,7 @@ describe('ScenarioStage', () => {
 
   it('renders visible operating state and brightness percentage for every lamp', () => {
     render(<ScenarioStage state={stateWith()} />);
-    expect(screen.getAllByText('STANDBY')).toHaveLength(5);
+    expect(screen.getAllByText('Standby')).toHaveLength(5);
     expect(screen.getAllByText('30% brightness')).toHaveLength(5);
   });
 

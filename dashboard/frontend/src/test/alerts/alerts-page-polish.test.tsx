@@ -15,7 +15,7 @@ describe('Alerts page polish', () => {
     ['Resolved', '10'],
     ['Critical', '1'],
     ['Warning', '9'],
-    ['Latest timestamp', '15/06/2026, 20:29:00 UTC'],
+    ['Latest timestamp', 'Jun 15, 2026, 8:29 PM UTC'],
   ])('renders the %s selector-backed summary card', (label, value) => {
     render(<AlertsDashboard />);
     expect(screen.getByLabelText(`${label} summary`)).toHaveTextContent(value);

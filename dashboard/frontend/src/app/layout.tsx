@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { DashboardDataProvider } from '@/features/live-data/dashboard-data-provider';
+import { LocalizationProvider } from '@/features/localization/localization-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="tr">
       <body>
-        <DashboardDataProvider>
-          <AppShell>{children}</AppShell>
-        </DashboardDataProvider>
+        <LocalizationProvider>
+          <DashboardDataProvider>
+            <AppShell>{children}</AppShell>
+          </DashboardDataProvider>
+        </LocalizationProvider>
       </body>
     </html>
   );

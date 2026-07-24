@@ -18,6 +18,7 @@ import {
   getLogById,
   getLogSummary,
 } from '@/features/logs/logs-selectors';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function LogsDashboard({
   rawLogs = activityFixture.logs,
@@ -30,6 +31,7 @@ export function LogsDashboard({
   windowEnd?: string | null;
   transportError?: string | null;
 }>) {
+  const { t } = useLocalization();
   const result = adaptLogs(rawLogs, { live });
   const [filters, setFilters] = useState<LogFilters>(DEFAULT_LOG_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -82,11 +84,11 @@ export function LogsDashboard({
       <section className="activity-results" aria-labelledby="log-results-title">
         <header>
           <div>
-            <p className="eyebrow">Newest first</p>
-            <h2 id="log-results-title">Operational log history</h2>
+            <p className="eyebrow">{t('alerts.newestFirst')}</p>
+            <h2 id="log-results-title">{t('logs.history')}</h2>
           </div>
           <strong>
-            {filtered.length} of {result.records.length} logs shown
+            {t('logs.shown', { shown: filtered.length, total: result.records.length })}
           </strong>
         </header>
         <div className="activity-workspace">

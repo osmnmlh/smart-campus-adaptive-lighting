@@ -13,9 +13,9 @@ describe('OverviewDashboard', () => {
       screen.getByRole('heading', { level: 1, name: 'Smart Campus Adaptive Lighting' }),
     ).toBeVisible();
     expect(screen.getByText('Mock Data')).toBeVisible();
-    expect(screen.getByText(/Backend bağlantısı henüz aktif değil/i)).toBeVisible();
-    expect(screen.getAllByText('AUTO_ADAPTIVE').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('2026-06-15 20:30 UTC')).toHaveLength(4);
+    expect(screen.getByText(/backend connection is not active yet/i)).toBeVisible();
+    expect(screen.getAllByText('Auto adaptive').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Jun 15, 2026, 8:30 PM UTC').length).toBeGreaterThan(0);
   });
 
   it('renders all summary and operational sections', () => {
@@ -24,7 +24,7 @@ describe('OverviewDashboard', () => {
     expect(screen.getByRole('heading', { name: 'Operational summary' })).toBeVisible();
     expect(screen.getByLabelText('Nodes summary')).toHaveTextContent('3');
     expect(screen.getByLabelText('Lamps summary')).toHaveTextContent('1 active');
-    expect(screen.getByLabelText('Active Alerts summary')).toHaveTextContent('WARNING');
+    expect(screen.getByLabelText('Active Alerts summary')).toHaveTextContent('Warning');
     expect(screen.getByLabelText('Active alert summary')).toBeVisible();
     expect(screen.getAllByRole('article')).toHaveLength(5);
     expect(screen.getByText('Infrastructure details').closest('details')).not.toHaveAttribute(
@@ -55,8 +55,8 @@ describe('OverviewDashboard', () => {
     expect(sensors.getAllByRole('listitem')).toHaveLength(6);
     expect(sensors.getByRole('heading', { name: 'IR3' })).toBeVisible();
     expect(sensors.getByRole('heading', { name: 'BH1750' })).toBeVisible();
-    expect(sensors.getAllByText('SIMULATED')).toHaveLength(6);
-    expect(sensors.getAllByText('GOOD')).toHaveLength(6);
+    expect(sensors.getAllByText('Simulated')).toHaveLength(6);
+    expect(sensors.getAllByText('Good')).toHaveLength(6);
     expect(sensors.queryByText(/IR3.*direction|direction.*IR3/i)).not.toBeInTheDocument();
   });
 

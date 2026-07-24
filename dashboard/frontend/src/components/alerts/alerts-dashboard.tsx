@@ -18,6 +18,7 @@ import {
   getAlertSummary,
   getAvailableAlertEntities,
 } from '@/features/alerts/alerts-selectors';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function AlertsDashboard({
   rawAlerts = activityFixture.alerts,
@@ -30,6 +31,7 @@ export function AlertsDashboard({
   windowEnd?: string | null;
   transportError?: string | null;
 }>) {
+  const { t } = useLocalization();
   const result = adaptAlerts(rawAlerts, { live });
   const [filters, setFilters] = useState<AlertFilters>(DEFAULT_ALERT_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -82,11 +84,11 @@ export function AlertsDashboard({
       <section className="activity-results" aria-labelledby="alert-results-title">
         <header>
           <div>
-            <p className="eyebrow">Newest first</p>
-            <h2 id="alert-results-title">Alert history</h2>
+            <p className="eyebrow">{t('alerts.newestFirst')}</p>
+            <h2 id="alert-results-title">{t('alerts.history')}</h2>
           </div>
           <strong>
-            {filtered.length} of {result.records.length} alerts shown
+            {t('alerts.shown', { shown: filtered.length, total: result.records.length })}
           </strong>
         </header>
         <div className="activity-workspace">

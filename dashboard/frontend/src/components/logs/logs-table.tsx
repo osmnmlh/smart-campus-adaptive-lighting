@@ -1,9 +1,9 @@
-import {
-  formatActivityEntity,
-  formatActivityTimestamp,
-  formatActivityValue,
-} from '@/features/activity/activity-formatters';
+'use client';
+
+import { formatActivityEntity, formatActivityValue } from '@/features/activity/activity-formatters';
 import type { LogRecord } from '@/features/logs/logs-model';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type Props = Readonly<{
   records: readonly LogRecord[];
@@ -12,29 +12,30 @@ type Props = Readonly<{
 }>;
 
 export function LogsTable({ records, selectedId, onSelect }: Props) {
+  const { locale, t, formatDateTime } = useLocalization();
   return (
     <div className="activity-table-scroll">
       <table className="activity-table">
-        <caption>Simulated operational logs, newest first</caption>
+        <caption>{t('logs.tableCaption')}</caption>
         <thead>
           <tr>
-            <th scope="col">Timestamp</th>
-            <th scope="col">Level</th>
-            <th scope="col">Category</th>
-            <th scope="col">Event</th>
-            <th scope="col">Entity</th>
-            <th scope="col">Scenario</th>
-            <th scope="col">Source</th>
-            <th scope="col">Details</th>
+            <th scope="col">{t('logs.timestamp')}</th>
+            <th scope="col">{t('logs.level')}</th>
+            <th scope="col">{t('logs.category')}</th>
+            <th scope="col">{t('logs.event')}</th>
+            <th scope="col">{t('alerts.entity')}</th>
+            <th scope="col">{t('logs.scenario')}</th>
+            <th scope="col">{t('logs.source')}</th>
+            <th scope="col">{t('logs.details')}</th>
           </tr>
         </thead>
         <tbody>
           {records.map((record) => (
             <tr key={record.id} data-selected={selectedId === record.id}>
-              <td>{formatActivityTimestamp(record.timestamp)}</td>
+              <td>{formatDateTime(record.timestamp)}</td>
               <td>
                 <span className="activity-label" data-tone={record.level.toLowerCase()}>
-                  {formatActivityValue(record.level)}
+                  {displayEnumLabel(locale, record.level)}
                 </span>
               </td>
               <td>{formatActivityValue(record.category)}</td>
@@ -43,15 +44,15 @@ export function LogsTable({ records, selectedId, onSelect }: Props) {
                 <small>{formatActivityValue(record.eventType)}</small>
               </td>
               <td>{formatActivityEntity(record.entityId)}</td>
-              <td>{record.scenarioId ?? 'None'}</td>
-              <td>{record.dataSource}</td>
+              <td>{record.scenarioId ?? t('common.none')}</td>
+              <td>{displayEnumLabel(locale, record.dataSource)}</td>
               <td>
                 <button
                   type="button"
                   aria-pressed={selectedId === record.id}
                   onClick={() => onSelect(record.id)}
                 >
-                  View {record.id}
+                  {t('logs.view', { id: record.id })}
                 </button>
               </td>
             </tr>

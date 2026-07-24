@@ -24,7 +24,7 @@ describe('Overview progressive disclosure', () => {
 
   it('keeps system mode visible while technical details are closed', () => {
     render(<OverviewDashboard model={model} />);
-    expect(screen.getByLabelText('System Mode summary')).toHaveTextContent('AUTO_ADAPTIVE');
+    expect(screen.getByLabelText('System mode summary')).toHaveTextContent('Auto adaptive');
   });
 
   it('keeps online node health visible in the primary summary', () => {
@@ -35,14 +35,14 @@ describe('Overview progressive disclosure', () => {
 
   it('keeps active alert severity visible outside disclosures', () => {
     render(<OverviewDashboard model={model} />);
-    expect(screen.getByLabelText('Active Alerts summary')).toHaveTextContent('WARNING');
+    expect(screen.getByLabelText('Active Alerts summary')).toHaveTextContent('Warning');
     expect(screen.getByLabelText('Active alert summary')).toBeVisible();
   });
 
   it('keeps simulated provenance and latest snapshot context visible', () => {
     render(<OverviewDashboard model={model} />);
-    expect(screen.getByLabelText('Data source notice')).toHaveTextContent('SIMULATED');
-    expect(screen.getAllByText('2026-06-15 20:30 UTC').length).toBeGreaterThan(0);
+    expect(screen.getByLabelText('Data source notice')).toHaveTextContent('Simulated');
+    expect(screen.getAllByText('Jun 15, 2026, 8:30 PM UTC').length).toBeGreaterThan(0);
   });
 
   it('starts both technical detail groups closed', () => {
@@ -91,7 +91,7 @@ describe('Overview progressive disclosure', () => {
     render(<OverviewDashboard model={model} />);
     const brightness = within(screen.getByLabelText('Lamp brightness summary'));
     expect(brightness.getAllByRole('meter')).toHaveLength(5);
-    expect(brightness.getAllByText('Source: SIMULATED')).toHaveLength(5);
+    expect(brightness.getAllByText('Source: Simulated')).toHaveLength(5);
   });
 
   it('does not duplicate GaugeMeters inside the technical disclosure', () => {

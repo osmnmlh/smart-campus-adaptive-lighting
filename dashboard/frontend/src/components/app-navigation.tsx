@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLocalization } from '@/features/localization/use-localization';
 
 const navigationItems = [
-  { href: '/', label: 'Overview' },
-  { href: '/topology', label: 'Topology' },
-  { href: '/metrics', label: 'Metrics' },
-  { href: '/scenarios', label: 'Scenarios' },
-  { href: '/alerts', label: 'Alerts' },
-  { href: '/logs', label: 'Logs' },
+  { href: '/', key: 'nav.overview' },
+  { href: '/topology', key: 'nav.topology' },
+  { href: '/metrics', key: 'nav.metrics' },
+  { href: '/scenarios', key: 'nav.scenarios' },
+  { href: '/alerts', key: 'nav.alerts' },
+  { href: '/logs', key: 'nav.logs' },
 ] as const;
 
 function isCurrentRoute(pathname: string, href: string): boolean {
@@ -19,16 +20,17 @@ function isCurrentRoute(pathname: string, href: string): boolean {
 
 export function AppNavigation() {
   const pathname = usePathname();
+  const { t } = useLocalization();
 
   return (
-    <nav className="app-navigation" aria-label="Dashboard navigation">
+    <nav className="app-navigation" aria-label={t('nav.label')}>
       {navigationItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           aria-current={isCurrentRoute(pathname, item.href) ? 'page' : undefined}
         >
-          {item.label}
+          {t(item.key)}
         </Link>
       ))}
     </nav>

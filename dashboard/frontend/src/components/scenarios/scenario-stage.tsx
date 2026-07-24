@@ -1,3 +1,5 @@
+'use client';
+
 import { Activity, ArrowLeft, ArrowRight, SunMedium, WifiOff } from 'lucide-react';
 import { useId } from 'react';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -6,6 +8,8 @@ import {
   type ScenarioStageLampId,
 } from '@/features/scenarios/scenario-stage-model';
 import type { ScenarioControllerState } from '@/features/scenarios/scenario-model';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 const motionX: Readonly<Record<ScenarioStageLampId, number>> = {
   L1: 110,
@@ -16,6 +20,7 @@ const motionX: Readonly<Record<ScenarioStageLampId, number>> = {
 };
 
 export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerState }>) {
+  const { locale, t } = useLocalization();
   const model = selectScenarioStageViewModel(state);
   const titleId = useId();
   const descriptionId = useId();
@@ -26,14 +31,14 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
     <figure className="scenario-stage" aria-labelledby={headingId}>
       <header className="scenario-stage-header">
         <div>
-          <p className="eyebrow">Simulated physical presentation</p>
-          <h2 id={headingId}>Campus road stage</h2>
+          <p className="eyebrow">{t('scenarios.stageEyebrow')}</p>
+          <h2 id={headingId}>{t('scenarios.stageTitle')}</h2>
           <p>{model.scenarioName}</p>
         </div>
-        <StatusBadge label="Simulated" tone="neutral" />
+        <StatusBadge label={t('common.simulated')} tone="neutral" />
       </header>
 
-      <div className="scenario-stage-status" aria-label="Scene status summary">
+      <div className="scenario-stage-status" aria-label={t('scenarios.sceneStatus')}>
         <span>
           <Activity size={16} aria-hidden="true" focusable="false" />
           {model.motionLabel}
@@ -42,11 +47,11 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
           {model.direction.arrow === null ? null : (
             <DirectionIcon size={16} aria-hidden="true" focusable="false" />
           )}
-          Direction: {model.direction.label}
+          {t('scenarios.direction')}: {model.direction.label}
         </span>
         <span>
           <SunMedium size={16} aria-hidden="true" focusable="false" />
-          BH1750: Ambient light sensor
+          BH1750: {t('scenarios.ambientLightSensor')}
         </span>
       </div>
 
@@ -58,7 +63,7 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
           aria-labelledby={`${titleId} ${descriptionId}`}
           focusable="false"
         >
-          <title id={titleId}>Five-lamp simulated campus road scene</title>
+          <title id={titleId}>{t('scenarios.stageSvgTitle')}</title>
           <desc id={descriptionId}>{model.summary}</desc>
           <defs aria-hidden="true">
             <marker
@@ -87,7 +92,7 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
             >
               <rect x={node.x} y="82" width={node.width} height="245" rx="12" />
               <text x={node.x + 14} y="105">
-                {node.id} · {node.offline ? 'OFFLINE' : 'ONLINE'}
+                {node.id} · {displayEnumLabel(locale, node.offline ? 'OFFLINE' : 'ONLINE')}
               </text>
             </g>
           ))}
@@ -123,10 +128,10 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
                 {lamp.id}
               </text>
               <text className="scenario-lamp-state" x={lamp.x} y="251" textAnchor="middle">
-                {lamp.operatingState}
+                {displayEnumLabel(locale, lamp.operatingState)}
               </text>
               <text className="scenario-lamp-brightness" x={lamp.x} y="266" textAnchor="middle">
-                {lamp.brightnessPercent}% brightness
+                {t('metrics.brightness', { value: lamp.brightnessPercent })}
               </text>
             </g>
           ))}
@@ -141,7 +146,7 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
               <circle className="scenario-sensor-pulse" cx={sensor.x} cy="303" r="19" />
               <circle className="scenario-sensor-dot" cx={sensor.x} cy="303" r="8" />
               <text x={sensor.x} y="322" textAnchor="middle">
-                {sensor.id} · {sensor.active ? 'ACTIVE' : 'INACTIVE'}
+                {sensor.id} · {displayEnumLabel(locale, sensor.active ? 'ACTIVE' : 'INACTIVE')}
               </text>
             </g>
           ))}
@@ -155,7 +160,7 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
               <circle cx="0" cy="284" r="12" />
               <path d="M -5 284 H 5 M 0 279 V 289" />
               <text x="0" y="347" textAnchor="middle">
-                Motion detected
+                {t('scenarios.motionDetected')}
               </text>
             </g>
           )}
@@ -177,16 +182,19 @@ export function ScenarioStage({ state }: Readonly<{ state: ScenarioControllerSta
         </svg>
       </div>
 
-      <div className="scenario-stage-node-status" aria-label="Node communication status">
+      <div className="scenario-stage-node-status" aria-label={t('scenarios.nodeCommunication')}>
         {model.nodes.map((node) => (
           <span key={node.id} data-offline={node.offline ? 'true' : 'false'}>
             {node.offline ? <WifiOff size={15} aria-hidden="true" focusable="false" /> : null}
-            {node.id}: {node.offline ? 'Offline' : 'Online'} · {node.lampIds.join(', ')}
+            {node.id}: {displayEnumLabel(locale, node.offline ? 'OFFLINE' : 'ONLINE')} ·{' '}
+            {node.lampIds.join(', ')}
           </span>
         ))}
       </div>
 
-      <figcaption>{model.summary} Source: Simulated.</figcaption>
+      <figcaption>
+        {model.summary} {t('common.source', { source: t('common.simulated') })}.
+      </figcaption>
     </figure>
   );
 }

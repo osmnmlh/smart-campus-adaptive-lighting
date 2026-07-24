@@ -1,16 +1,17 @@
+'use client';
+
+import { useLocalization } from '@/features/localization/use-localization';
+
 export function LogsErrorState({
   message,
   live = false,
 }: Readonly<{ message: string; live?: boolean }>) {
+  const { t } = useLocalization();
   return (
     <section className="activity-error" role="status" aria-live="polite">
-      <h2>Log history is unavailable</h2>
+      <h2>{t('logs.unavailable')}</h2>
       <p>{message}</p>
-      <p>
-        {live
-          ? 'Live records were not presented and no mock fallback was used.'
-          : 'The simulated fixture was not presented. No network retry is required.'}
-      </p>
+      <p>{live ? t('logs.liveFailure') : t('logs.simulatedFailure')}</p>
     </section>
   );
 }

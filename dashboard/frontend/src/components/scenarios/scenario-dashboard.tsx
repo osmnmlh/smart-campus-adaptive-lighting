@@ -15,6 +15,7 @@ import {
 } from '@/features/scenarios/scenario-reducer';
 import { selectSnapshotPreview } from '@/features/scenarios/scenario-selectors';
 import type { ScenarioTransitionError } from '@/features/scenarios/scenario-model';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function ScenarioErrorNotice({ error }: Readonly<{ error: ScenarioTransitionError }>) {
   return (
@@ -26,6 +27,7 @@ export function ScenarioErrorNotice({ error }: Readonly<{ error: ScenarioTransit
 }
 
 export function ScenarioDashboard() {
+  const { t } = useLocalization();
   const [state, dispatch] = useReducer(scenarioControllerReducer, undefined, () =>
     createScenarioControllerState(null),
   );
@@ -36,25 +38,19 @@ export function ScenarioDashboard() {
     <div className="scenario-dashboard">
       <header className="scenario-header">
         <div>
-          <p className="eyebrow">Frontend-only scenario workspace</p>
-          <h1>Scenario Controls</h1>
-          <p>
-            Inspect deterministic mock behavior with an explicit virtual clock and no live system
-            connection.
-          </p>
+          <p className="eyebrow">{t('scenarios.eyebrow')}</p>
+          <h1>{t('scenarios.title')}</h1>
+          <p>{t('scenarios.description')}</p>
         </div>
         <div className="scenario-header-state">
-          <span>Lifecycle</span>
+          <span>{t('scenarios.lifecycle')}</span>
           <strong aria-live="polite">{state.lifecycle}</strong>
         </div>
       </header>
 
-      <aside className="scenario-local-warning" aria-label="Local simulation notice">
-        <strong>Local simulation only</strong>
-        <p>
-          These controls do not send commands to devices, backend services, MQTT, or WebSocket
-          endpoints.
-        </p>
+      <aside className="scenario-local-warning" aria-label={t('scenarios.notice')}>
+        <strong>{t('scenarios.localOnly')}</strong>
+        <p>{t('scenarios.noCommands')}</p>
       </aside>
 
       {state.lastError === null ? null : <ScenarioErrorNotice error={state.lastError} />}
@@ -67,9 +63,9 @@ export function ScenarioDashboard() {
       />
       {state.selectedScenarioId === null ? (
         <section className="scenario-initial-empty" aria-labelledby="scenario-empty-title">
-          <p className="eyebrow">No scenario selected</p>
-          <h2 id="scenario-empty-title">Choose a simulated scenario to begin</h2>
-          <p>The catalog remains local, deterministic, and disconnected from production devices.</p>
+          <p className="eyebrow">{t('scenarios.noneSelected')}</p>
+          <h2 id="scenario-empty-title">{t('scenarios.chooseToBegin')}</h2>
+          <p>{t('scenarios.catalogLocal')}</p>
         </section>
       ) : null}
       <ScenarioControls lifecycle={state.lifecycle} speed={state.speed} dispatch={dispatch} />
@@ -79,8 +75,8 @@ export function ScenarioDashboard() {
       <div className="scenario-two-column">
         <ScenarioProgress state={state} />
         <DisclosurePanel
-          title="Scenario snapshot details"
-          description="Inspect the complete deterministic state and entity breakdown."
+          title={t('scenarios.snapshotTitle')}
+          description={t('scenarios.snapshotDescription')}
           className="scenario-snapshot-disclosure"
         >
           <ScenarioSnapshotPreview snapshot={snapshot} />

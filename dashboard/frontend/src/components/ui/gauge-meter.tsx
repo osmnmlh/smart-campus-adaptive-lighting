@@ -1,7 +1,11 @@
+'use client';
+
 import type { DataSource } from '@smart-campus/contracts';
 import type { ReactNode } from 'react';
 import { createGaugeMeterModel } from './gauge-meter-model';
 import type { StatusTone } from './status-badge';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type GaugeMeterProps = Readonly<{
   value: number;
@@ -26,6 +30,7 @@ export function GaugeMeter({
   description,
   className,
 }: GaugeMeterProps) {
+  const { locale, t } = useLocalization();
   const model = createGaugeMeterModel(value, max);
   const classes = ['gauge-meter', className].filter(Boolean).join(' ');
 
@@ -36,10 +41,12 @@ export function GaugeMeter({
           {icon === undefined ? null : <span aria-hidden="true">{icon}</span>}
           <span>{label}</span>
         </div>
-        <strong>Unavailable</strong>
+        <strong>{t('common.unavailable')}</strong>
         <small>{model.reason}</small>
         {dataSource === undefined ? null : (
-          <span className="data-provenance">Source: {dataSource}</span>
+          <span className="data-provenance">
+            {t('common.source', { source: displayEnumLabel(locale, dataSource) })}
+          </span>
         )}
       </div>
     );
@@ -85,7 +92,9 @@ export function GaugeMeter({
         </div>
         {description === undefined ? null : <small>{description}</small>}
         {dataSource === undefined ? null : (
-          <span className="data-provenance">Source: {dataSource}</span>
+          <span className="data-provenance">
+            {t('common.source', { source: displayEnumLabel(locale, dataSource) })}
+          </span>
         )}
       </div>
     </div>

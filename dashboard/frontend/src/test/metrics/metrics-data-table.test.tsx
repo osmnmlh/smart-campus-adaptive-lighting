@@ -32,17 +32,17 @@ describe('MetricsDataTable', () => {
 
   it('shows timestamp, value, unit, source, and quality text', () => {
     render(<MetricsDataTable rows={rows} caption="Selected metrics" />);
-    expect(screen.getAllByText('2026-06-15 20:30 UTC').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Jun 15, 2026, 8:30 PM UTC').length).toBeGreaterThan(0);
     expect(screen.getAllByText('100%').length).toBeGreaterThan(0);
     expect(screen.getAllByText('%').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('SIMULATED').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('GOOD').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Simulated').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Good').length).toBeGreaterThan(0);
   });
 
   it('marks stale and invalid rows with visible text', () => {
     render(<MetricsDataTable rows={rows} caption="Selected metrics" />);
-    expect(screen.getAllByText('STALE').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('INVALID').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Stale').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Invalid').length).toBeGreaterThan(0);
     expect(document.querySelectorAll('tr[data-quality="stale"]').length).toBeGreaterThan(0);
     expect(document.querySelectorAll('tr[data-quality="invalid"]').length).toBe(1);
   });

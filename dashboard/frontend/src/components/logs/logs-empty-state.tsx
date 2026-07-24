@@ -1,23 +1,26 @@
+'use client';
+
+import { useLocalization } from '@/features/localization/use-localization';
+
 export function LogsEmptyState({
   fixtureEmpty,
   onClear,
   live = false,
 }: Readonly<{ fixtureEmpty: boolean; onClear: () => void; live?: boolean }>) {
+  const { t } = useLocalization();
   return (
     <div className="activity-empty">
       <h3>
         {fixtureEmpty
-          ? `No ${live ? 'backend' : 'simulated'} log records are available`
-          : 'No logs match the selected filters'}
+          ? t('logs.noFixture', {
+              source: live ? t('common.backendData') : t('common.simulatedData'),
+            })
+          : t('logs.noMatches')}
       </h3>
-      <p>
-        {fixtureEmpty
-          ? 'The deterministic fixture is empty.'
-          : 'Choose another filter combination or clear the current filters.'}
-      </p>
+      <p>{fixtureEmpty ? t('logs.fixtureEmpty') : t('logs.chooseFilters')}</p>
       {fixtureEmpty ? null : (
         <button type="button" onClick={onClear}>
-          Clear filters
+          {t('alerts.clearFilters')}
         </button>
       )}
     </div>

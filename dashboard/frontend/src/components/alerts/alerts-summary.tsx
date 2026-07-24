@@ -1,9 +1,12 @@
+'use client';
+
 import { AlertTriangle, Bell, BellRing, CircleCheckBig, Clock3, OctagonAlert } from 'lucide-react';
 import { SummaryCard } from '@/components/dashboard/summary-card';
-import { formatActivityTimestamp } from '@/features/activity/activity-formatters';
 import type { AlertSummary } from '@/features/alerts/alerts-model';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function AlertsSummary({ summary }: Readonly<{ summary: AlertSummary }>) {
+  const { t, formatDateTime } = useLocalization();
   const iconProps = {
     size: 20,
     strokeWidth: 2.1,
@@ -14,51 +17,51 @@ export function AlertsSummary({ summary }: Readonly<{ summary: AlertSummary }>) 
   return (
     <section aria-labelledby="alerts-summary-title">
       <h2 id="alerts-summary-title" className="activity-section-title">
-        Dataset summary
+        {t('alerts.datasetSummary')}
       </h2>
       <div className="alert-summary-grid">
         <SummaryCard
-          label="Total alerts"
+          label={t('alerts.total')}
           value={summary.totalAlerts}
-          detail="Full dataset"
+          detail={t('alerts.fullDataset')}
           icon={<Bell {...iconProps} />}
         />
         <SummaryCard
-          label="Active"
+          label={t('alerts.active')}
           value={summary.activeAlerts}
-          detail="Open simulated alerts"
+          detail={t('alerts.openSimulated')}
           tone={summary.activeAlerts > 0 ? 'warning' : 'ready'}
           icon={<BellRing {...iconProps} />}
         />
         <SummaryCard
-          label="Resolved"
+          label={t('alerts.resolved')}
           value={summary.resolvedAlerts}
-          detail="Closed records"
+          detail={t('alerts.closedRecords')}
           tone="ready"
           icon={<CircleCheckBig {...iconProps} />}
         />
         <SummaryCard
-          label="Critical"
+          label={t('alerts.critical')}
           value={summary.criticalAlerts}
-          detail="Critical severity records"
+          detail={t('alerts.criticalRecords')}
           tone={summary.criticalAlerts > 0 ? 'critical' : 'ready'}
           icon={<OctagonAlert {...iconProps} />}
         />
         <SummaryCard
-          label="Warning"
+          label={t('alerts.warning')}
           value={summary.warningAlerts}
-          detail="Warning severity records"
+          detail={t('alerts.warningRecords')}
           tone={summary.warningAlerts > 0 ? 'warning' : 'ready'}
           icon={<AlertTriangle {...iconProps} />}
         />
         <SummaryCard
-          label="Latest timestamp"
+          label={t('alerts.latestTimestamp')}
           value={
             summary.latestAlertTimestamp === null
-              ? 'None'
-              : formatActivityTimestamp(summary.latestAlertTimestamp)
+              ? t('common.none')
+              : formatDateTime(summary.latestAlertTimestamp)
           }
-          detail="Newest record"
+          detail={t('alerts.newestRecord')}
           icon={<Clock3 {...iconProps} />}
         />
       </div>

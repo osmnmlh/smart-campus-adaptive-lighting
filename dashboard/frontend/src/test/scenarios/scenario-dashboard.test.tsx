@@ -40,9 +40,9 @@ describe('ScenarioDashboard', () => {
     expect(screen.getByRole('button', { name: 'Start' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Step +1s' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled();
-    expect(screen.getByText('UNAVAILABLE')).not.toBeVisible();
-    expect(screen.getAllByText(/SIMULATED/)).toHaveLength(5);
-    expect(screen.queryByText('GOOD')).not.toBeInTheDocument();
+    expect(screen.getByText('Unavailable')).not.toBeVisible();
+    expect(screen.getAllByText(/Simulated/)).toHaveLength(3);
+    expect(screen.queryByText('Good')).not.toBeInTheDocument();
     expect(screen.getByText(/Select a simulated scenario to create/i)).not.toBeVisible();
   });
 

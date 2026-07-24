@@ -1,39 +1,40 @@
-import {
-  formatActivityEntity,
-  formatActivityTimestamp,
-  formatActivityValue,
-} from '@/features/activity/activity-formatters';
+'use client';
+
+import { formatActivityEntity, formatActivityValue } from '@/features/activity/activity-formatters';
 import type { LogRecord } from '@/features/logs/logs-model';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function LogDetailPanel({ log }: Readonly<{ log: LogRecord | null }>) {
+  const { locale, t, formatDateTime } = useLocalization();
   if (log === null) {
     return (
       <aside className="activity-detail" aria-labelledby="log-detail-title">
-        <p className="eyebrow">Log details</p>
-        <h2 id="log-detail-title">Select a log to inspect its details</h2>
-        <p>No replay, deletion, or export action is available in this deterministic demo.</p>
+        <p className="eyebrow">{t('logs.detailTitle')}</p>
+        <h2 id="log-detail-title">{t('logs.selectDetail')}</h2>
+        <p>{t('logs.noActions')}</p>
       </aside>
     );
   }
 
   const items = [
-    ['Log ID', log.id],
-    ['Timestamp', formatActivityTimestamp(log.timestamp)],
-    ['Level', formatActivityValue(log.level)],
-    ['Category', formatActivityValue(log.category)],
-    ['Event type', formatActivityValue(log.eventType)],
-    ['Entity type', formatActivityValue(log.entityType)],
-    ['Entity ID', formatActivityEntity(log.entityId)],
-    ['Scenario', log.scenarioId ?? 'None'],
-    ['Summary', log.summary],
-    ['Details', log.details],
-    ['Data source', log.dataSource],
-    ['Sequence', log.sequence],
+    [t('logs.logId'), log.id],
+    [t('logs.timestamp'), formatDateTime(log.timestamp)],
+    [t('logs.level'), displayEnumLabel(locale, log.level)],
+    [t('logs.category'), formatActivityValue(log.category)],
+    [t('logs.eventType'), formatActivityValue(log.eventType)],
+    [t('logs.entityType'), formatActivityValue(log.entityType)],
+    [t('logs.entityId'), formatActivityEntity(log.entityId)],
+    [t('logs.scenario'), log.scenarioId ?? t('common.none')],
+    [t('logs.summary'), log.summary],
+    [t('logs.details'), log.details],
+    [t('metrics.dataSource'), displayEnumLabel(locale, log.dataSource)],
+    [t('logs.sequence'), log.sequence],
   ] as const;
 
   return (
     <aside className="activity-detail" aria-labelledby="log-detail-title">
-      <p className="eyebrow">Log details</p>
+      <p className="eyebrow">{t('logs.detailTitle')}</p>
       <h2 id="log-detail-title">{log.summary}</h2>
       <dl>
         {items.map(([label, value]) => (
@@ -43,7 +44,7 @@ export function LogDetailPanel({ log }: Readonly<{ log: LogRecord | null }>) {
           </div>
         ))}
       </dl>
-      <p>Simulated demo record; not a production log.</p>
+      <p>{t('logs.demoRecord')}</p>
     </aside>
   );
 }
