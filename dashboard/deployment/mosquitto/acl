@@ -1,0 +1,7 @@
+user gateway_gw1
+topic write smart-campus/v1/nodes/+/+
+topic write smart-campus/v1/gateways/GW_1/status
+
+user backend_ingest
+topic read smart-campus/v1/nodes/+/+
+topic read smart-campus/v1/gateways/+/status
