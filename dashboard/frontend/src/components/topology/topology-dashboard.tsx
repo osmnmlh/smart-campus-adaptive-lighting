@@ -6,45 +6,41 @@ import { TopologyCanvas } from './topology-canvas';
 import { TopologyDetailPanel } from './topology-detail-panel';
 import { TopologyLegend } from './topology-legend';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { useLocalization } from '@/features/localization/use-localization';
 import type { TopologyGraphModel } from '@/features/topology/topology-model';
 import { applyTopologySelection, topologyDetail } from '@/features/topology/topology-selectors';
 
-type TopologyDashboardProps = Readonly<{
-  initialGraph: TopologyGraphModel;
-  live?: boolean;
-}>;
-
-export function TopologyDashboard({ initialGraph, live = false }: TopologyDashboardProps) {
+export function TopologyDashboard({
+  initialGraph,
+  live = false,
+}: Readonly<{ initialGraph: TopologyGraphModel; live?: boolean }>) {
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const { t, formatDateTime } = useLocalization();
   const graph = useMemo(
     () => applyTopologySelection(initialGraph, selectedEntityId),
     [initialGraph, selectedEntityId],
   );
   const detail = topologyDetail(graph, graph.selectedEntityId);
   const clearSelection = useCallback(() => setSelectedEntityId(null), []);
-
   return (
     <div className="topology-dashboard">
       <header className="topology-header">
         <div>
-          <p className="eyebrow">Interactive topology</p>
-          <h1>System Topology</h1>
-          <p>
-            Controller, lamp, sensor ve deterministic relationship görünümü. Bu ekran production
-            deployment şeması değildir.
-          </p>
+          <p className="eyebrow">{t('topology.eyebrow')}</p>
+          <h1>{t('topology.title')}</h1>
+          <p>{t('topology.subtitle')}</p>
         </div>
         <div className="topology-header-meta">
           <StatusBadge
-            label={live ? 'Backend Data' : 'Simulated Data'}
+            label={live ? t('common.backendData') : t('common.simulatedData')}
             tone={live ? 'ready' : 'neutral'}
           />
           <span>
-            Snapshot: <time dateTime={graph.snapshotAt}>{graph.snapshotAtLabel}</time>
+            {t('common.snapshot')}:{' '}
+            <time dateTime={graph.snapshotAt}>{formatDateTime(graph.snapshotAt)}</time>
           </span>
         </div>
       </header>
-
       <div className="topology-workspace">
         <TopologyCanvas
           graph={graph}
@@ -53,7 +49,6 @@ export function TopologyDashboard({ initialGraph, live = false }: TopologyDashbo
         />
         <TopologyDetailPanel detail={detail} />
       </div>
-
       <TopologyLegend />
       <TopologyAccessibleList
         graph={graph}

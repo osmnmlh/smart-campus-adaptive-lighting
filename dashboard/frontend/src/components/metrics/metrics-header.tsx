@@ -1,39 +1,40 @@
+'use client';
+
 import { StatusBadge } from '@/components/ui/status-badge';
-import { formatMetricTimestamp } from '@/features/metrics/metrics-formatters';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function MetricsHeader({
   snapshotAt,
   live = false,
   sampleCount = 0,
 }: Readonly<{ snapshotAt: string | null; live?: boolean; sampleCount?: number }>) {
+  const { t, formatDateTime } = useLocalization();
   return (
     <header className="metrics-header">
       <div>
-        <p className="eyebrow">{live ? 'Live session telemetry' : 'Deterministic telemetry'}</p>
-        <h1>System Metrics</h1>
-        <p>
-          {live
-            ? 'Current backend values and bounded history collected during this browser session.'
-            : 'Fixed-window Apache ECharts views for simulated lamp, ambient-light, sensor, and quality metrics. This is not production telemetry evidence.'}
-        </p>
+        <p className="eyebrow">{live ? t('metrics.liveEyebrow') : t('metrics.simulatedEyebrow')}</p>
+        <h1>{t('metrics.title')}</h1>
+        <p>{live ? t('metrics.liveDescription') : t('metrics.simulatedDescription')}</p>
       </div>
       <div className="metrics-header-meta">
         <StatusBadge
-          label={live ? 'Live Session' : 'Simulated Data'}
+          label={live ? t('metrics.liveSession') : t('common.simulatedData')}
           tone={live ? 'ready' : 'neutral'}
         />
         {live ? (
           <span>
-            {sampleCount} session sample{sampleCount === 1 ? '' : 's'}
+            {sampleCount === 1
+              ? t('metrics.sessionSample')
+              : t('metrics.sessionSamples', { count: sampleCount })}
           </span>
         ) : null}
         {snapshotAt ? (
           <span>
-            {live ? 'Latest update' : 'Fixture end'}:{' '}
-            <time dateTime={snapshotAt}>{formatMetricTimestamp(snapshotAt)}</time>
+            {live ? t('common.latestUpdate') : t('common.fixtureEnd')}:{' '}
+            <time dateTime={snapshotAt}>{formatDateTime(snapshotAt)}</time>
           </span>
         ) : (
-          <span>{live ? 'Session history unavailable' : 'Fixture end unavailable'}</span>
+          <span>{live ? t('metrics.sessionUnavailable') : t('metrics.fixtureUnavailable')}</span>
         )}
       </div>
     </header>

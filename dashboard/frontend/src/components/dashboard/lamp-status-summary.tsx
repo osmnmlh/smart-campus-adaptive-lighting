@@ -1,8 +1,12 @@
+'use client';
+
 import type { DataSource } from '@smart-campus/contracts';
 import { SectionCard } from '@/components/ui/section-card';
 import { GaugeMeter } from '@/components/ui/gauge-meter';
 import { StatusBadge } from '@/components/ui/status-badge';
 import type { OverviewLamp } from '@/features/overview/overview-model';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type LampStatusSummaryProps = Readonly<{
   lamps: readonly OverviewLamp[];
@@ -11,44 +15,51 @@ type LampStatusSummaryProps = Readonly<{
 }>;
 
 export function LampStatusSummary({ lamps, dataSource, showGauge = true }: LampStatusSummaryProps) {
+  const { locale, t } = useLocalization();
   return (
     <SectionCard
-      title="Lamp status"
-      description="Operating state, health, and simulated brightness controls."
+      title={t('overview.lampStatus')}
+      description={t('overview.lampStatusDescription')}
       titleId="lamp-status-title"
-      ariaLabel="Lamp status summary"
+      ariaLabel={t('overview.lampStatusAria')}
     >
-      <ul className="entity-grid" aria-label="Lamp status items">
+      <ul className="entity-grid" aria-label={t('overview.lampItemsAria')}>
         {lamps.map((lamp) => (
           <li className="entity-card" key={lamp.contractId}>
             <div className="entity-card-header">
               <h3>{lamp.id}</h3>
-              <StatusBadge label={lamp.operatingStateLabel} tone={lamp.operatingStateTone} />
+              <StatusBadge
+                label={displayEnumLabel(locale, lamp.operatingState)}
+                tone={lamp.operatingStateTone}
+              />
             </div>
             {showGauge ? (
               <GaugeMeter
                 value={lamp.brightnessPercent}
                 max={100}
-                label="Brightness"
+                label={t('overview.brightness')}
                 unit="%"
                 tone={lamp.operatingStateTone}
                 dataSource={dataSource}
-                description={`${lamp.id} brightness percentage`}
+                description={t('overview.brightnessDescription', { id: lamp.id })}
               />
             ) : null}
             <dl className="compact-metrics">
               <div>
-                <dt>Health</dt>
+                <dt>{t('overview.health')}</dt>
                 <dd>
-                  <StatusBadge label={lamp.healthLabel} tone={lamp.healthTone} />
+                  <StatusBadge
+                    label={displayEnumLabel(locale, lamp.health)}
+                    tone={lamp.healthTone}
+                  />
                 </dd>
               </div>
               <div>
-                <dt>Target brightness</dt>
+                <dt>{t('overview.targetBrightness')}</dt>
                 <dd>{lamp.targetBrightnessPercent}%</dd>
               </div>
               <div>
-                <dt>PWM duty percent</dt>
+                <dt>{t('overview.pwmDuty')}</dt>
                 <dd>{lamp.pwmDutyPercent}%</dd>
               </div>
             </dl>
@@ -60,25 +71,26 @@ export function LampStatusSummary({ lamps, dataSource, showGauge = true }: LampS
 }
 
 export function LampBrightnessSummary({ lamps, dataSource }: LampStatusSummaryProps) {
+  const { t } = useLocalization();
   return (
     <SectionCard
-      title="Lamp brightness"
-      description="Current simulated brightness for every campus lamp."
+      title={t('overview.lampBrightness')}
+      description={t('overview.lampBrightnessDescription')}
       titleId="lamp-brightness-title"
-      ariaLabel="Lamp brightness summary"
+      ariaLabel={t('overview.lampBrightnessAria')}
     >
-      <ul className="lamp-brightness-grid" aria-label="Lamp brightness items">
+      <ul className="lamp-brightness-grid" aria-label={t('overview.lampBrightnessItemsAria')}>
         {lamps.map((lamp) => (
           <li key={lamp.contractId}>
             <h3>{lamp.id}</h3>
             <GaugeMeter
               value={lamp.brightnessPercent}
               max={100}
-              label="Brightness"
+              label={t('overview.brightness')}
               unit="%"
               tone={lamp.operatingStateTone}
               dataSource={dataSource}
-              description={`${lamp.id} brightness percentage`}
+              description={t('overview.brightnessDescription', { id: lamp.id })}
             />
           </li>
         ))}

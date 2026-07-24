@@ -48,9 +48,7 @@ describe('TopologyDashboard', () => {
     expect(clear).toBeEnabled();
     fireEvent.click(clear);
 
-    expect(
-      screen.getByRole('heading', { name: 'Bir node, lamba veya sensör seçin' }),
-    ).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Select a node, lamp, or sensor' })).toBeVisible();
     expect(topologyList().getByRole('button', { name: /IR2/ })).toHaveAttribute(
       'aria-pressed',
       'false',

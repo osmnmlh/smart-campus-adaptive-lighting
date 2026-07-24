@@ -22,6 +22,7 @@ import {
   selectedMetricPoints,
   sensorActivityMetricSeries,
 } from '@/features/metrics/metrics-selectors';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function MetricsDashboard({
   initialState,
@@ -32,6 +33,7 @@ export function MetricsDashboard({
   energySummary?: EnergyAnalyticsSummary | null;
   live?: boolean;
 }>) {
+  const { t } = useLocalization();
   const [selectedLampId, setSelectedLampId] = useState('lamp-2');
   const [selectedSensorId, setSelectedSensorId] = useState('sensor-ir-2');
   const [timeRange, setTimeRange] = useState<TimeRange>('15m');
@@ -61,9 +63,7 @@ export function MetricsDashboard({
       />
       {initialState.status !== 'ready' || !model || !selection ? (
         <MetricsEmptyState
-          title={
-            initialState.status === 'empty' ? 'No metric series available' : 'Metrics unavailable'
-          }
+          title={initialState.status === 'empty' ? t('metrics.noSeries') : t('metrics.unavailable')}
           message={initialState.message}
         />
       ) : (

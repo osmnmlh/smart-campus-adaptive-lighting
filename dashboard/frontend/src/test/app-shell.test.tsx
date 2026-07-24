@@ -24,7 +24,7 @@ describe('AppShell', () => {
   it('backend bağlantısının henüz aktif olmadığını gösterir', () => {
     render(<HomePage />);
 
-    expect(screen.getByText(/Backend bağlantısı henüz aktif değil/i)).toBeVisible();
+    expect(screen.getByText(/backend connection is not active yet/i)).toBeVisible();
   });
 
   it('uydurma enerji veya finansal ölçüm göstermez', () => {

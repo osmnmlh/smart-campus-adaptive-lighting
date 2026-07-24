@@ -36,7 +36,7 @@ describe('Scenario snapshot progressive disclosure', () => {
     render(<ScenarioDashboard />);
     openSnapshot();
     expect(screen.getByRole('heading', { name: 'Snapshot preview' })).toBeVisible();
-    expect(screen.getByText('UNAVAILABLE')).toBeVisible();
+    expect(screen.getByText('Unavailable')).toBeVisible();
   });
 
   it('keeps the initial IDLE lifecycle outside the collapsed panel', () => {

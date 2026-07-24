@@ -1663,6 +1663,36 @@ h3 {
   gap: 6px;
 }
 
+.language-selector {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+}
+
+.language-selector button {
+  min-width: 34px;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  color: #d9e7ed;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.language-selector button[aria-pressed='true'] {
+  color: var(--navy-950);
+  background: #54d2cb;
+}
+
+.language-selector button:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+
 .app-navigation a {
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 6px;
@@ -3188,6 +3218,10 @@ h3 {
   .activity-results > header {
     align-items: start;
     flex-direction: column;
+  }
+
+  .language-selector {
+    max-width: 100%;
   }
 
   .activity-detail dl > div {

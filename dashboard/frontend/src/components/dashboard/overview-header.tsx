@@ -1,31 +1,33 @@
+'use client';
+
 import { StatusBadge } from '@/components/ui/status-badge';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 import type { OverviewModel } from '@/features/overview/overview-model';
 
-type OverviewHeaderProps = Readonly<{
-  model: OverviewModel;
-}>;
-
-export function OverviewHeader({ model }: OverviewHeaderProps) {
+export function OverviewHeader({ model }: Readonly<{ model: OverviewModel }>) {
+  const { locale, t, formatDateTime } = useLocalization();
   return (
     <header className="overview-header" aria-labelledby="page-title">
       <div className="overview-title-block">
-        <p className="eyebrow">Overview dashboard</p>
+        <p className="eyebrow">{t('overview.eyebrow')}</p>
         <h1 id="page-title">Smart Campus Adaptive Lighting</h1>
-        <p className="overview-subtitle">
-          Adaptif aydınlatma sisteminin genel durum ve operasyon görünümü.
-        </p>
+        <p className="overview-subtitle">{t('overview.subtitle')}</p>
       </div>
-      <dl className="overview-meta" aria-label="Snapshot metadata">
+      <dl className="overview-meta" aria-label={t('overview.snapshotMetadata')}>
         <div>
-          <dt>System mode</dt>
+          <dt>{t('overview.systemMode')}</dt>
           <dd>
-            <StatusBadge label={model.systemMode} tone={model.systemModeTone} />
+            <StatusBadge
+              label={displayEnumLabel(locale, model.systemMode)}
+              tone={model.systemModeTone}
+            />
           </dd>
         </div>
         <div>
-          <dt>Snapshot time</dt>
+          <dt>{t('overview.snapshotTime')}</dt>
           <dd>
-            <time dateTime={model.snapshotAt}>{model.snapshotAtLabel}</time>
+            <time dateTime={model.snapshotAt}>{formatDateTime(model.snapshotAt)}</time>
           </dd>
         </div>
       </dl>

@@ -1,5 +1,9 @@
+'use client';
+
 import type { TopologyDetailModel } from '@/features/topology/topology-model';
 import { displayEntityId } from '@/features/overview/overview-selectors';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type TopologyDetailPanelProps = Readonly<{
   detail: TopologyDetailModel;
@@ -8,46 +12,54 @@ type TopologyDetailPanelProps = Readonly<{
 const labelFor = (entityId: string) => displayEntityId(entityId.split(':').at(-1) ?? entityId);
 
 export function TopologyDetailPanel({ detail }: TopologyDetailPanelProps) {
+  const { locale, t, formatDateTime, formatNumber } = useLocalization();
+  const enumLabel = (value: string) => displayEnumLabel(locale, value);
+
   if (!detail) {
     return (
       <aside className="topology-detail-panel" aria-labelledby="topology-detail-title">
-        <p className="eyebrow">Selection detail</p>
-        <h2 id="topology-detail-title">Bir node, lamba veya sensör seçin</h2>
-        <p>
-          Canvas veya görünür Topology List üzerinden bir varlık seçerek ilişkilerini inceleyin.
-        </p>
+        <p className="eyebrow">{t('topology.selectionDetail')}</p>
+        <h2 id="topology-detail-title">{t('topology.choose')}</h2>
+        <p>{t('topology.chooseDescription')}</p>
       </aside>
     );
   }
 
+  const statusText =
+    detail.entityType === 'controller'
+      ? `${enumLabel(detail.health)} · ${t('topology.communicationHealth')} ${enumLabel(detail.communicationHealth)}`
+      : detail.entityType === 'lamp'
+        ? `${enumLabel(detail.operatingState)} · ${enumLabel(detail.health)} · ${formatNumber(detail.brightnessPercent)}%`
+        : `${enumLabel(detail.sensorType)} · ${detail.active === null ? t('topology.systemAmbient') : enumLabel(detail.active ? 'ACTIVE' : 'INACTIVE')} · ${enumLabel(detail.health)}`;
+
   return (
     <aside className="topology-detail-panel" aria-labelledby="topology-detail-title">
-      <p className="eyebrow">Selection detail</p>
+      <p className="eyebrow">{t('topology.selectionDetail')}</p>
       <h2 id="topology-detail-title">{detail.label}</h2>
-      <p className="topology-detail-status">{detail.statusText}</p>
+      <p className="topology-detail-status">{statusText}</p>
 
       {detail.entityType === 'controller' ? (
         <dl className="topology-detail-list">
           <div>
-            <dt>Entity type</dt>
-            <dd>Controller node</dd>
+            <dt>{t('topology.entityType')}</dt>
+            <dd>{t('topology.controllerNode')}</dd>
           </div>
           <div>
-            <dt>Health</dt>
-            <dd>{detail.health}</dd>
+            <dt>{t('topology.health')}</dt>
+            <dd>{enumLabel(detail.health)}</dd>
           </div>
           <div>
-            <dt>Communication health</dt>
-            <dd>{detail.communicationHealth}</dd>
+            <dt>{t('topology.communicationHealth')}</dt>
+            <dd>{enumLabel(detail.communicationHealth)}</dd>
           </div>
           <div>
-            <dt>Owned lamps</dt>
+            <dt>{t('topology.ownedLamps')}</dt>
             <dd>{detail.ownedLampIds.map(labelFor).join(', ')}</dd>
           </div>
           <div>
-            <dt>Snapshot time</dt>
+            <dt>{t('topology.snapshotTime')}</dt>
             <dd>
-              <time dateTime={detail.updatedAt}>{detail.updatedAtLabel}</time>
+              <time dateTime={detail.updatedAt}>{formatDateTime(detail.updatedAt)}</time>
             </dd>
           </div>
         </dl>
@@ -56,32 +68,32 @@ export function TopologyDetailPanel({ detail }: TopologyDetailPanelProps) {
       {detail.entityType === 'lamp' ? (
         <dl className="topology-detail-list">
           <div>
-            <dt>Operating state</dt>
-            <dd>{detail.operatingState}</dd>
+            <dt>{t('topology.operatingState')}</dt>
+            <dd>{enumLabel(detail.operatingState)}</dd>
           </div>
           <div>
-            <dt>Health</dt>
-            <dd>{detail.health}</dd>
+            <dt>{t('topology.health')}</dt>
+            <dd>{enumLabel(detail.health)}</dd>
           </div>
           <div>
-            <dt>brightnessPercent</dt>
-            <dd>{detail.brightnessPercent}%</dd>
+            <dt>{t('topology.brightness')}</dt>
+            <dd>{formatNumber(detail.brightnessPercent)}%</dd>
           </div>
           <div>
-            <dt>targetBrightnessPercent</dt>
-            <dd>{detail.targetBrightnessPercent}%</dd>
+            <dt>{t('topology.targetBrightness')}</dt>
+            <dd>{formatNumber(detail.targetBrightnessPercent)}%</dd>
           </div>
           <div>
-            <dt>pwmDutyPercent</dt>
-            <dd>{detail.pwmDutyPercent}%</dd>
+            <dt>{t('topology.pwmDuty')}</dt>
+            <dd>{formatNumber(detail.pwmDutyPercent)}%</dd>
           </div>
           <div>
-            <dt>Owner node</dt>
+            <dt>{t('topology.ownerNode')}</dt>
             <dd>{labelFor(detail.ownerNodeId)}</dd>
           </div>
           <div>
-            <dt>Neighbor lamps</dt>
-            <dd>{detail.neighborLampIds.map(labelFor).join(', ') || 'None'}</dd>
+            <dt>{t('topology.neighborLamps')}</dt>
+            <dd>{detail.neighborLampIds.map(labelFor).join(', ') || t('common.none')}</dd>
           </div>
         </dl>
       ) : null}
@@ -89,29 +101,33 @@ export function TopologyDetailPanel({ detail }: TopologyDetailPanelProps) {
       {detail.entityType === 'sensor' ? (
         <dl className="topology-detail-list">
           <div>
-            <dt>Sensor type</dt>
-            <dd>{detail.sensorType}</dd>
+            <dt>{t('topology.sensorType')}</dt>
+            <dd>{enumLabel(detail.sensorType)}</dd>
           </div>
           <div>
-            <dt>Health</dt>
-            <dd>{detail.health}</dd>
+            <dt>{t('topology.health')}</dt>
+            <dd>{enumLabel(detail.health)}</dd>
           </div>
           <div>
-            <dt>Activity</dt>
-            <dd>{detail.activityText}</dd>
-          </div>
-          <div>
-            <dt>Data source</dt>
-            <dd>{detail.dataSource}</dd>
-          </div>
-          <div>
-            <dt>Metric quality</dt>
-            <dd>{detail.metricQuality}</dd>
-          </div>
-          <div>
-            <dt>Related segment</dt>
+            <dt>{t('topology.activity')}</dt>
             <dd>
-              {detail.relatedLampId ? labelFor(detail.relatedLampId) : 'System ambient sensor'}
+              {detail.active === null
+                ? t('topology.systemAmbient')
+                : enumLabel(detail.active ? 'ACTIVE' : 'INACTIVE')}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('topology.dataSource')}</dt>
+            <dd>{enumLabel(detail.dataSource)}</dd>
+          </div>
+          <div>
+            <dt>{t('topology.metricQuality')}</dt>
+            <dd>{enumLabel(detail.metricQuality)}</dd>
+          </div>
+          <div>
+            <dt>{t('topology.relatedSegment')}</dt>
+            <dd>
+              {detail.relatedLampId ? labelFor(detail.relatedLampId) : t('topology.systemAmbient')}
             </dd>
           </div>
         </dl>

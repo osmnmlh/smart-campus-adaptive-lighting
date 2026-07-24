@@ -5,6 +5,7 @@ import {
   type ScenarioSpeed,
 } from '@/features/scenarios/scenario-model';
 import { selectControlAvailability } from '@/features/scenarios/scenario-selectors';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type ScenarioControlsProps = Readonly<{
   lifecycle: ScenarioLifecycle;
@@ -14,58 +15,59 @@ type ScenarioControlsProps = Readonly<{
 
 export function ScenarioControls({ lifecycle, speed, dispatch }: ScenarioControlsProps) {
   const controls = selectControlAvailability(lifecycle);
+  const { t } = useLocalization();
   return (
     <section className="scenario-controls" aria-labelledby="scenario-controls-title">
       <div>
-        <p className="eyebrow">Manual virtual clock</p>
-        <h2 id="scenario-controls-title">Scenario controls</h2>
+        <p className="eyebrow">{t('scenarios.manualClock')}</p>
+        <h2 id="scenario-controls-title">{t('scenarios.controls')}</h2>
       </div>
-      <div className="scenario-control-buttons" aria-label="Lifecycle controls">
+      <div className="scenario-control-buttons" aria-label={t('scenarios.lifecycleControls')}>
         <button
           type="button"
           disabled={!controls.canStart}
           onClick={() => dispatch({ type: 'START' })}
         >
-          Start
+          {t('scenarios.start')}
         </button>
         <button
           type="button"
           disabled={!controls.canPause}
           onClick={() => dispatch({ type: 'PAUSE' })}
         >
-          Pause
+          {t('scenarios.pause')}
         </button>
         <button
           type="button"
           disabled={!controls.canResume}
           onClick={() => dispatch({ type: 'RESUME' })}
         >
-          Resume
+          {t('scenarios.resume')}
         </button>
         <button
           type="button"
           disabled={!controls.canReset}
           onClick={() => dispatch({ type: 'RESET' })}
         >
-          Reset
+          {t('scenarios.reset')}
         </button>
         <button
           type="button"
           disabled={!controls.canAdvance}
           onClick={() => dispatch({ type: 'STEP' })}
         >
-          Step +1s
+          {t('scenarios.step')}
         </button>
         <button
           type="button"
           disabled={!controls.canAdvance}
           onClick={() => dispatch({ type: 'ADVANCE' })}
         >
-          Advance +5s
+          {t('scenarios.advance')}
         </button>
       </div>
       <fieldset className="scenario-speed-control">
-        <legend>Virtual speed multiplier</legend>
+        <legend>{t('scenarios.speed')}</legend>
         <div>
           {SCENARIO_SPEEDS.map((value) => (
             <button
@@ -79,9 +81,7 @@ export function ScenarioControls({ lifecycle, speed, dispatch }: ScenarioControl
           ))}
         </div>
       </fieldset>
-      <p className="scenario-control-note">
-        Speed multiplies only the next manual step. No timer or autoplay is running.
-      </p>
+      <p className="scenario-control-note">{t('scenarios.speedNote')}</p>
     </section>
   );
 }

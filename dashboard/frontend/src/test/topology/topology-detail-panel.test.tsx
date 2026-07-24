@@ -10,10 +10,8 @@ describe('TopologyDetailPanel', () => {
   it('shows an explanatory no-selection state', () => {
     render(<TopologyDetailPanel detail={null} />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Bir node, lamba veya sensör seçin' }),
-    ).toBeVisible();
-    expect(screen.getByText(/Canvas veya görünür Topology List/i)).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Select a node, lamp, or sensor' })).toBeVisible();
+    expect(screen.getByText(/canvas or visible Topology List/i)).toBeVisible();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
@@ -22,11 +20,11 @@ describe('TopologyDetailPanel', () => {
     const panel = screen.getByRole('complementary');
 
     expect(within(panel).getByRole('heading', { name: 'L3' })).toBeVisible();
-    expect(panel).toHaveTextContent('PRE_LIGHT');
-    expect(panel).toHaveTextContent('HEALTHY');
-    expect(panel).toHaveTextContent('brightnessPercent60%');
-    expect(panel).toHaveTextContent('targetBrightnessPercent60%');
-    expect(panel).toHaveTextContent('pwmDutyPercent60%');
+    expect(panel).toHaveTextContent('Pre-light');
+    expect(panel).toHaveTextContent('Healthy');
+    expect(panel).toHaveTextContent('Brightness60%');
+    expect(panel).toHaveTextContent('Target brightness60%');
+    expect(panel).toHaveTextContent('PWM duty60%');
     expect(panel).toHaveTextContent('NODE_2');
     expect(panel).toHaveTextContent('L2, L4');
     expect(panel).not.toHaveTextContent(/^pwmDuty$/);
@@ -37,9 +35,9 @@ describe('TopologyDetailPanel', () => {
     const panel = screen.getByRole('complementary');
 
     expect(panel).toHaveTextContent('NODE_1');
-    expect(panel).toHaveTextContent('Communication healthHEALTHY');
+    expect(panel).toHaveTextContent('Communication healthHealthy');
     expect(panel).toHaveTextContent('Owned lampsL1, L2');
-    expect(panel).toHaveTextContent('2026-06-15 20:30 UTC');
+    expect(panel).toHaveTextContent('Jun 15, 2026, 8:30 PM UTC');
   });
 
   it('shows IR3 telemetry metadata without a direction claim', () => {
@@ -47,8 +45,8 @@ describe('TopologyDetailPanel', () => {
     const panel = screen.getByRole('complementary');
 
     expect(panel).toHaveTextContent('IR3');
-    expect(panel).toHaveTextContent('Data sourceSIMULATED');
-    expect(panel).toHaveTextContent('Metric qualityGOOD');
+    expect(panel).toHaveTextContent('Data sourceSimulated');
+    expect(panel).toHaveTextContent('Metric qualityGood');
     expect(panel).toHaveTextContent('Related segmentL3');
     expect(panel).not.toHaveTextContent(/direction/i);
   });

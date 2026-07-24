@@ -1,4 +1,7 @@
+'use client';
+
 import type { MetricsDashboardModel, TimeRange } from '@/features/metrics/metrics-model';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type MetricsToolbarProps = Readonly<{
   model: MetricsDashboardModel;
@@ -25,10 +28,11 @@ export function MetricsToolbar({
   onSensorChange,
   onTimeRangeChange,
 }: MetricsToolbarProps) {
+  const { t } = useLocalization();
   return (
-    <section className="metrics-toolbar" aria-label="Metrics filters">
+    <section className="metrics-toolbar" aria-label={t('metrics.filters')}>
       <label>
-        <span>Lamp</span>
+        <span>{t('metrics.lamp')}</span>
         <select value={selectedLampId} onChange={(event) => onLampChange(event.target.value)}>
           {model.lamps.map((lamp) => (
             <option key={lamp.lampId} value={lamp.lampId}>
@@ -38,7 +42,7 @@ export function MetricsToolbar({
         </select>
       </label>
       <label>
-        <span>IR sensor</span>
+        <span>{t('metrics.irSensor')}</span>
         <select value={selectedSensorId} onChange={(event) => onSensorChange(event.target.value)}>
           {model.sensors.map((sensor) => (
             <option key={sensor.sensorId} value={sensor.sensorId}>
@@ -48,7 +52,7 @@ export function MetricsToolbar({
         </select>
       </label>
       <fieldset>
-        <legend>Fixed time range</legend>
+        <legend>{t('metrics.fixedRange')}</legend>
         <div className="metrics-range-buttons">
           {ranges.map((range) => (
             <button

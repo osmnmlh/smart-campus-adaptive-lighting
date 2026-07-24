@@ -142,8 +142,8 @@ describe('MetricsDashboard', () => {
     render(
       <MetricsDashboard initialState={readyState} energySummary={measuredEnergySummary} live />,
     );
-    expect(screen.getAllByText('Source: MEASURED')).toHaveLength(1);
-    expect(screen.getAllByText('Source: ESTIMATED')).toHaveLength(4);
+    expect(screen.getAllByText('Source: Measured')).toHaveLength(1);
+    expect(screen.getAllByText('Source: Estimated')).toHaveLength(4);
     expect(screen.getByText('1/5 (20%)')).toBeVisible();
   });
 

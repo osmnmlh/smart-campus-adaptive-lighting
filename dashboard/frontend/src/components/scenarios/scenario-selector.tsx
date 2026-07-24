@@ -1,22 +1,24 @@
-import type { ScenarioCatalogItem, ScenarioId } from '@/features/scenarios/scenario-model';
-import { formatScenarioDuration } from '@/features/scenarios/scenario-formatters';
+'use client';
 
-type ScenarioSelectorProps = Readonly<{
-  items: readonly ScenarioCatalogItem[];
-  selectedId: ScenarioId | null;
-  disabled?: boolean;
-  onSelect: (scenarioId: ScenarioId) => void;
-}>;
+import type { ScenarioCatalogItem, ScenarioId } from '@/features/scenarios/scenario-model';
+import { useLocalization } from '@/features/localization/use-localization';
+import type { TranslationKey } from '@/features/localization/messages';
 
 export function ScenarioSelector({
   items,
   selectedId,
   disabled = false,
   onSelect,
-}: ScenarioSelectorProps) {
+}: Readonly<{
+  items: readonly ScenarioCatalogItem[];
+  selectedId: ScenarioId | null;
+  disabled?: boolean;
+  onSelect: (scenarioId: ScenarioId) => void;
+}>) {
+  const { t, formatDuration } = useLocalization();
   return (
     <fieldset className="scenario-selector" disabled={disabled}>
-      <legend>Choose a local scenario</legend>
+      <legend>{t('scenarios.choose')}</legend>
       <div className="scenario-selector-grid">
         {items.map(({ id, definition, eventCount, simulated }) => (
           <label key={id} className="scenario-option" data-selected={selectedId === id}>
@@ -28,12 +30,15 @@ export function ScenarioSelector({
               onChange={() => onSelect(id)}
             />
             <span className="scenario-option-heading">
-              <strong>{definition.name}</strong>
-              <span>{formatScenarioDuration(definition.durationMs)}</span>
+              <strong>{t(`scenario.${id}.name` as TranslationKey)}</strong>
+              <span>{formatDuration(definition.durationMs)}</span>
             </span>
-            <span>{definition.description}</span>
+            <span>{t(`scenario.${id}.description` as TranslationKey)}</span>
             <small>
-              {eventCount} scheduled events · {simulated ? 'SIMULATED' : 'UNAVAILABLE'}
+              {t('scenarios.events', {
+                count: eventCount,
+                source: simulated ? 'SIMULATED' : 'UNAVAILABLE',
+              })}
             </small>
           </label>
         ))}

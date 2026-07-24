@@ -69,10 +69,10 @@ describe('LogsDashboard', () => {
   it('renders a safe empty-fixture state', () => {
     render(<LogsDashboard rawLogs={[]} />);
     expect(
-      screen.getByRole('heading', { name: 'No simulated log records are available' }),
+      screen.getByRole('heading', { name: 'No Simulated Data log records are available' }),
     ).toBeVisible();
     const empty = screen.getByRole('heading', {
-      name: 'No simulated log records are available',
+      name: 'No Simulated Data log records are available',
     }).parentElement;
     if (empty === null) throw new Error('Expected log empty state');
     expect(within(empty).queryByRole('button', { name: 'Clear filters' })).not.toBeInTheDocument();

@@ -2,9 +2,12 @@
 
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useDashboardData } from '@/features/live-data/dashboard-data-provider';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 export function DashboardConnectionStatus() {
   const state = useDashboardData();
+  const { locale, t } = useLocalization();
   const tone =
     state.transportStatus === 'CONNECTED'
       ? 'ready'
@@ -12,12 +15,12 @@ export function DashboardConnectionStatus() {
         ? 'warning'
         : 'neutral';
   return (
-    <div className="dashboard-connection-status" aria-label="Dashboard data connection">
-      <StatusBadge label={state.transportStatus} tone={tone} />
+    <div className="dashboard-connection-status" aria-label={t('connection.label')}>
+      <StatusBadge label={displayEnumLabel(locale, state.transportStatus)} tone={tone} />
       <span>
         {state.configuredMode === 'simulated'
-          ? 'Local simulated data'
-          : `Backend mode: ${state.backendDataMode}`}
+          ? t('connection.localSimulated')
+          : t('connection.backendMode', { mode: displayEnumLabel(locale, state.backendDataMode) })}
       </span>
     </div>
   );

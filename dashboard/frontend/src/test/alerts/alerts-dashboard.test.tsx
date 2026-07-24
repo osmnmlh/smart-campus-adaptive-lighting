@@ -70,10 +70,10 @@ describe('AlertsDashboard', () => {
   it('renders a safe empty-fixture state', () => {
     render(<AlertsDashboard rawAlerts={[]} />);
     expect(
-      screen.getByRole('heading', { name: 'No simulated alert records are available' }),
+      screen.getByRole('heading', { name: 'No Simulated Data alert records are available' }),
     ).toBeVisible();
     const empty = screen.getByRole('heading', {
-      name: 'No simulated alert records are available',
+      name: 'No Simulated Data alert records are available',
     }).parentElement;
     if (empty === null) throw new Error('Expected alert empty state');
     expect(within(empty).queryByRole('button', { name: 'Clear filters' })).not.toBeInTheDocument();

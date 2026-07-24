@@ -89,7 +89,7 @@ describe('GaugeMeter component', () => {
     expect(meter).toHaveAttribute('aria-valuenow', '60');
     expect(screen.getByText('60%')).toBeVisible();
     expect(screen.getByText('Brightness')).toBeVisible();
-    expect(screen.getByText('Source: SIMULATED')).toBeVisible();
+    expect(screen.getByText('Source: Simulated')).toBeVisible();
   });
 
   it('keeps estimated provenance distinct from measured provenance', () => {
@@ -97,8 +97,8 @@ describe('GaugeMeter component', () => {
       <GaugeMeter value={30} max={100} label="Target" unit="%" dataSource={DataSource.ESTIMATED} />,
     );
 
-    expect(screen.getByText('Source: ESTIMATED')).toBeVisible();
-    expect(screen.queryByText('Source: MEASURED')).not.toBeInTheDocument();
+    expect(screen.getByText('Source: Estimated')).toBeVisible();
+    expect(screen.queryByText('Source: Measured')).not.toBeInTheDocument();
   });
 
   it('supports a custom maximum without changing the visible value', () => {

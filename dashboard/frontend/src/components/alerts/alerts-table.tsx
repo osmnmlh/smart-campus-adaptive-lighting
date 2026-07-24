@@ -1,9 +1,9 @@
-import {
-  formatActivityEntity,
-  formatActivityTimestamp,
-  formatActivityValue,
-} from '@/features/activity/activity-formatters';
+'use client';
+
+import { formatActivityEntity } from '@/features/activity/activity-formatters';
 import type { AlertRecord } from '@/features/alerts/alerts-model';
+import { displayEnumLabel } from '@/features/localization/display-labels';
+import { useLocalization } from '@/features/localization/use-localization';
 
 type Props = Readonly<{
   records: readonly AlertRecord[];
@@ -12,20 +12,21 @@ type Props = Readonly<{
 }>;
 
 export function AlertsTable({ records, selectedId, onSelect }: Props) {
+  const { locale, t, formatDateTime } = useLocalization();
   return (
     <div className="activity-table-scroll">
       <table className="activity-table">
-        <caption>Simulated alert history, newest first</caption>
+        <caption>{t('alerts.tableCaption')}</caption>
         <thead>
           <tr>
-            <th scope="col">Created at</th>
-            <th scope="col">Severity</th>
-            <th scope="col">Status</th>
-            <th scope="col">Alert</th>
-            <th scope="col">Entity</th>
-            <th scope="col">Scenario</th>
-            <th scope="col">Source</th>
-            <th scope="col">Details</th>
+            <th scope="col">{t('alerts.createdAt')}</th>
+            <th scope="col">{t('alerts.severity')}</th>
+            <th scope="col">{t('alerts.status')}</th>
+            <th scope="col">{t('alerts.alert')}</th>
+            <th scope="col">{t('alerts.entity')}</th>
+            <th scope="col">{t('alerts.scenario')}</th>
+            <th scope="col">{t('overview.source')}</th>
+            <th scope="col">{t('alerts.details')}</th>
           </tr>
         </thead>
         <tbody>
@@ -48,15 +49,15 @@ export function AlertsTable({ records, selectedId, onSelect }: Props) {
                 data-status={record.status}
                 data-active={record.status === 'ACTIVE'}
               >
-                <td>{formatActivityTimestamp(record.createdAt)}</td>
+                <td>{formatDateTime(record.createdAt)}</td>
                 <td>
                   <span className="activity-label" data-tone={record.severity.toLowerCase()}>
-                    {formatActivityValue(record.severity)}
+                    {displayEnumLabel(locale, record.severity)}
                   </span>
                 </td>
                 <td>
                   <span className="activity-label" data-tone={record.status.toLowerCase()}>
-                    {formatActivityValue(record.status)}
+                    {displayEnumLabel(locale, record.status)}
                   </span>
                 </td>
                 <td>
@@ -64,15 +65,15 @@ export function AlertsTable({ records, selectedId, onSelect }: Props) {
                   <small>{record.id}</small>
                 </td>
                 <td>{formatActivityEntity(record.entityId)}</td>
-                <td>{record.scenarioId ?? 'None'}</td>
-                <td>{record.dataSource}</td>
+                <td>{record.scenarioId ?? t('common.none')}</td>
+                <td>{displayEnumLabel(locale, record.dataSource)}</td>
                 <td>
                   <button
                     type="button"
                     aria-pressed={selectedId === record.id}
                     onClick={() => onSelect(record.id)}
                   >
-                    View {record.id}
+                    {t('alerts.view', { id: record.id })}
                   </button>
                 </td>
               </tr>

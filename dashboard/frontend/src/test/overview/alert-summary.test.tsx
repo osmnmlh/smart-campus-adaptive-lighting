@@ -11,11 +11,11 @@ describe('AlertSummary', () => {
     render(<AlertSummary alerts={model.alerts} summary={model.summary} />);
 
     expect(screen.getByLabelText('Active alert summary')).toHaveTextContent('1 active');
-    expect(screen.getByLabelText('Active alert summary')).toHaveTextContent('WARNING');
+    expect(screen.getByLabelText('Active alert summary')).toHaveTextContent('Warning');
     expect(screen.getByText('Yön doğrulama süresi aşıldı')).toBeVisible();
     expect(screen.getByText('Warning')).toBeVisible();
     expect(screen.getByText(/IR1/)).toBeVisible();
-    expect(screen.getByText(/2026-06-15 20:29 UTC/)).toBeVisible();
+    expect(screen.getByText(/Jun 15, 2026, 8:29 PM UTC/)).toBeVisible();
   });
 
   it('renders at most three alert rows', () => {
