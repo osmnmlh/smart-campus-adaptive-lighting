@@ -17,6 +17,7 @@ export default function MetricsPage() {
           : createMetricsDashboardState(metricsTelemetryFixture)
       }
       live={live}
+      energySummary={state.energySummary}
     />
   );
 }

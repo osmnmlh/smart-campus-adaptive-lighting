@@ -10,6 +10,8 @@ import { MetricsEmptyState } from './metrics-empty-state';
 import { MetricsHeader } from './metrics-header';
 import { MetricsToolbar } from './metrics-toolbar';
 import { SensorActivityChart } from './sensor-activity-chart';
+import { EnergyAnalyticsSection } from './energy-analytics-section';
+import type { EnergyAnalyticsSummary } from '@smart-campus/contracts';
 import type { MetricsDashboardState, TimeRange } from '@/features/metrics/metrics-model';
 import {
   ambientMetricSeries,
@@ -23,8 +25,13 @@ import {
 
 export function MetricsDashboard({
   initialState,
+  energySummary,
   live = false,
-}: Readonly<{ initialState: MetricsDashboardState; live?: boolean }>) {
+}: Readonly<{
+  initialState: MetricsDashboardState;
+  energySummary?: EnergyAnalyticsSummary | null;
+  live?: boolean;
+}>) {
   const [selectedLampId, setSelectedLampId] = useState('lamp-2');
   const [selectedSensorId, setSelectedSensorId] = useState('sensor-ir-2');
   const [timeRange, setTimeRange] = useState<TimeRange>('15m');
@@ -93,14 +100,7 @@ export function MetricsDashboard({
             <CommunicationStatusSummary items={nodeCommunicationStatuses(model)} />
           </div>
 
-          <section className="metrics-electrical-state" aria-labelledby="electrical-state-title">
-            <p className="eyebrow">Unavailable metric family</p>
-            <h2 id="electrical-state-title">Electrical metrics not available</h2>
-            <p>
-              INA219 current, voltage, and power data are not provided in the current dashboard
-              dataset. No electrical, savings, cost, or carbon values are inferred.
-            </p>
-          </section>
+          <EnergyAnalyticsSection summary={energySummary ?? null} live={live} />
 
           <MetricsDataTable
             rows={selection.rows}

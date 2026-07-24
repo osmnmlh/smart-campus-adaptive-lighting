@@ -66,6 +66,7 @@ import { InMemoryLiveReadModelUpdateAdapter } from './infrastructure/in-memory/i
     InMemoryScenarioReadRepository,
     InMemoryLiveReadModelUpdateAdapter,
     LIVE_READ_MODEL_UPDATE,
+    SNAPSHOT_READ_REPOSITORY,
     GetSystemSnapshotService,
     ListAlertsService,
     GetAlertService,

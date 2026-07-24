@@ -1,9 +1,11 @@
 import {
   AlertSchema,
   EventLogSchema,
+  EnergyAnalyticsSummarySchema,
   SystemSnapshotSchema,
   type Alert,
   type EventLog,
+  type EnergyAnalyticsSummary,
   type SystemSnapshot,
 } from '@smart-campus/contracts';
 
@@ -11,6 +13,7 @@ export type InitialLiveData = Readonly<{
   snapshot: SystemSnapshot;
   alerts: readonly Alert[];
   logs: readonly EventLog[];
+  energySummary: EnergyAnalyticsSummary;
 }>;
 
 type Schema<T> = Readonly<{
@@ -67,7 +70,7 @@ export async function fetchInitialLiveData(
 ): Promise<InitialLiveData> {
   const request = timeoutSignal(parentSignal);
   try {
-    const [snapshot, alerts, logs] = await Promise.all([
+    const [snapshot, alerts, logs, energySummary] = await Promise.all([
       fetchValidated(`${httpUrl}/api/v1/system/snapshot`, SystemSnapshotSchema, request.signal),
       fetchValidated(
         `${httpUrl}/api/v1/alerts?timeRange=all&limit=100`,
@@ -79,8 +82,13 @@ export async function fetchInitialLiveData(
         { safeParse: (value) => EventLogSchema.array().safeParse(value) },
         request.signal,
       ),
+      fetchValidated(
+        `${httpUrl}/api/v1/energy/summary`,
+        EnergyAnalyticsSummarySchema,
+        request.signal,
+      ),
     ]);
-    return { snapshot, alerts, logs };
+    return { snapshot, alerts, logs, energySummary };
   } finally {
     request.cleanup();
   }

@@ -36,4 +36,35 @@ describe('environment configuration', () => {
 
     expect(config.corsOrigins).toEqual(['http://localhost:3000', 'https://dashboard.example.test']);
   });
+
+  it('uses the documented MVP energy defaults', () => {
+    const config = loadEnvironment({});
+    expect(config.energyNominalLampPowerW).toBe(10);
+    expect(config.energyMeasurementStaleMs).toBe(15_000);
+    expect(config.energyMaxIntegrationGapMs).toBe(30_000);
+  });
+
+  it('rejects invalid nominal lamp powers', () => {
+    for (const value of ['0', '-1', 'NaN', 'Infinity', '1001']) {
+      expect(() => loadEnvironment({ ENERGY_NOMINAL_LAMP_POWER_W: value })).toThrow(
+        'Invalid ENERGY_NOMINAL_LAMP_POWER_W',
+      );
+    }
+  });
+
+  it('rejects invalid measurement stale times', () => {
+    for (const value of ['0', '-1', '1.5', '3600001']) {
+      expect(() => loadEnvironment({ ENERGY_MEASUREMENT_STALE_MS: value })).toThrow(
+        'Invalid ENERGY_MEASUREMENT_STALE_MS',
+      );
+    }
+  });
+
+  it('rejects invalid integration gaps', () => {
+    for (const value of ['0', '-1', '1.5', '300001']) {
+      expect(() => loadEnvironment({ ENERGY_MAX_INTEGRATION_GAP_MS: value })).toThrow(
+        'Invalid ENERGY_MAX_INTEGRATION_GAP_MS',
+      );
+    }
+  });
 });

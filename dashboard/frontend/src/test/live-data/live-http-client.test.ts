@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { fetchInitialLiveData } from '@/features/live-data/live-http-client';
 import { createSimulatedLiveDataState } from '@/features/live-data/live-data-state';
 import { overviewSnapshot } from '@/features/overview/overview-fixture';
+import { simulatedEnergySummary } from '@/features/metrics/energy-fixture';
 
 const state = createSimulatedLiveDataState();
 
@@ -14,12 +15,13 @@ describe('fetchInitialLiveData', () => {
     vi.unstubAllGlobals();
   });
 
-  it('loads and validates all three REST resources', async () => {
+  it('loads and validates all four REST resources', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(response({ data: overviewSnapshot, meta: {} }))
       .mockResolvedValueOnce(response({ data: state.alerts, meta: {} }))
-      .mockResolvedValueOnce(response({ data: state.logs, meta: {} }));
+      .mockResolvedValueOnce(response({ data: state.logs, meta: {} }))
+      .mockResolvedValueOnce(response({ data: simulatedEnergySummary, meta: {} }));
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await fetchInitialLiveData(
@@ -29,7 +31,8 @@ describe('fetchInitialLiveData', () => {
     expect(result.snapshot).toEqual(overviewSnapshot);
     expect(result.alerts).toHaveLength(state.alerts.length);
     expect(result.logs).toHaveLength(state.logs.length);
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(result.energySummary).toEqual(simulatedEnergySummary);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 
   it('requests bounded all-history lists', async () => {
@@ -37,13 +40,15 @@ describe('fetchInitialLiveData', () => {
       .fn()
       .mockResolvedValueOnce(response({ data: overviewSnapshot }))
       .mockResolvedValueOnce(response({ data: [] }))
-      .mockResolvedValueOnce(response({ data: [] }));
+      .mockResolvedValueOnce(response({ data: [] }))
+      .mockResolvedValueOnce(response({ data: simulatedEnergySummary }));
     vi.stubGlobal('fetch', fetchMock);
     await fetchInitialLiveData('http://localhost:3101', new AbortController().signal);
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(
       expect.arrayContaining([
         'http://localhost:3101/api/v1/alerts?timeRange=all&limit=100',
         'http://localhost:3101/api/v1/logs?timeRange=all&limit=100',
+        'http://localhost:3101/api/v1/energy/summary',
       ]),
     );
   });
@@ -80,6 +85,6 @@ describe('fetchInitialLiveData', () => {
     await expect(
       fetchInitialLiveData('http://localhost:3101', controller.signal),
     ).rejects.toThrow();
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 });

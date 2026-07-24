@@ -26,6 +26,23 @@ describe('DashboardDataProvider', () => {
     vi.unstubAllGlobals();
   });
 
+  it('provides a deterministic simulated summary without measured lamps', () => {
+    function EnergyProbe() {
+      const state = useDashboardData();
+      return (
+        <span>
+          {state.energySummary?.measuredLampCount}/{state.energySummary?.totalLampCount}
+        </span>
+      );
+    }
+    render(
+      <DashboardDataProvider>
+        <EnergyProbe />
+      </DashboardDataProvider>,
+    );
+    expect(screen.getByText('0/5')).toBeVisible();
+  });
+
   it('creates only real browser-session points for live metrics', () => {
     const state = createLiveMetricsDashboardState([overviewSnapshot]);
     expect(state.status).toBe('ready');
