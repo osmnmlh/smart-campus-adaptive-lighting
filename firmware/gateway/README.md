@@ -9,12 +9,15 @@ Gateway loss must not affect local lighting control.
 | ---------------- | ------------------------------- | ---------- |
 | `native`         | Host-only core and codec tests  | N/A        |
 | `esp32dev-ci`    | Compile-only lab build          | Explicitly unencrypted and non-deployable |
+| `esp32dev-tls-ci` | Compile-only MQTTS wiring check | Placeholder CA, explicitly non-deployable |
 | `esp32dev-field` | Provisioned field compile       | Static PMK plus one LMK per allowlisted peer |
 
 The CI MAC values and broker address are documentation-reserved placeholders. They
-are not deployable identities. Copy `include/gateway_secrets.example.hpp` to the
-ignored `include/gateway_secrets.hpp` only on a provisioning workstation. Never
-commit that copy. Field builds without it fail at preprocessing.
+are not deployable identities. On a provisioning workstation, copy
+`include/gateway_secrets.example.hpp` to the ignored `include/gateway_secrets.hpp`
+and `include/gateway_tls_ca.example.hpp` to the ignored
+`include/gateway_tls_ca.hpp`. Replace every placeholder. Never commit either copy.
+Field builds without both files fail at preprocessing.
 
 ## Runtime boundary
 
@@ -54,11 +57,19 @@ reconstructed from current UTC minus monotonic time elapsed since callback arriv
 the firmware never publishes epoch/1970 placeholders. `ONLINE` requires Wi-Fi,
 channel alignment, ESP-NOW, all peers, UTC, and MQTT.
 
-The field header supplies the complete broker URI plus optional username/password;
-the broker host and port are not compiled as production constants. Empty credentials
-remain available only for controlled loopback/LAN labs. Internet deployments require
-authentication, topic ACLs, and verified TLS. The current firmware does not complete
-TLS certificate verification, so an `mqtts://` URI alone is not production readiness.
+The field secrets header supplies the complete `mqtts://` broker URI and mandatory
+username/password. The separate CA header supplies a null-terminated PEM trust
+anchor. Before creating the client, the field policy rejects plaintext MQTT, missing
+credentials, an empty/malformed/placeholder CA, unsupported schemes, and credentials
+embedded in the URI. The installed ESP-MQTT API receives the CA through `cert_pem`;
+its normal certificate-chain and hostname checks remain enabled. There is no
+plaintext fallback after TLS failure.
+
+A controlled, non-public LAN lab may still use `mqtt://...:1883`. A lab using
+`mqtts://` must also provide a valid CA. The compile-only TLS CI profile deliberately
+uses a rejected placeholder and cannot produce a deployable configuration. Rotating
+the broker CA requires updating the ignored CA header, rebuilding the field image,
+and manually flashing the explicitly mapped gateway.
 
 Node messages use QoS 1 and are non-retained. Only the retained gateway birth/status
 and retained `OFFLINE` Last Will use the gateway status topic. The LWT timestamp is

@@ -22,6 +22,7 @@ canonical headers:
 
 ```text
 firmware/gateway/include/gateway_secrets.hpp
+firmware/gateway/include/gateway_tls_ca.hpp
 firmware/node/include/node_secrets.hpp
 ```
 
@@ -29,17 +30,20 @@ Never commit MACs, Wi-Fi credentials, MQTT credentials, PMKs, or LMKs. `GW_1` ow
 Wi-Fi, UTC, and MQTT. Nodes have no Internet or MQTT connection and communicate only
 over ESP-NOW with registered peers.
 
-A controlled local LAN may use `mqtt://192.168.x.x:1883`. The URI remains
-configurable. An online service normally uses `mqtts://mqtt.example.com:8883` plus
-username/password, least-privilege ACLs, and verified TLS. Anonymous or TLS-free
-Internet listeners are prohibited. Current gateway firmware does not complete TLS
-certificate verification; do not treat an `mqtts` URI alone as production-ready.
+A controlled local LAN may use `mqtt://192.168.x.x:1883`. A field image requires an
+`mqtts://` hostname, non-empty username/password, and a trusted CA PEM copied from
+`firmware/gateway/include/gateway_tls_ca.example.hpp`. The gateway verifies the
+broker certificate chain and hostname and never falls back to plaintext. Anonymous
+or TLS-free Internet listeners are prohibited. A CA change requires rebuilding and
+manually flashing the gateway.
 
 ## Manual flash order
 
-Map every physical board to a COM port yourself. Never infer a port from enumeration.
-Flash the gateway first, then the three nodes. These commands are examples only and
-are not run by the integration smoke:
+First verify that the online stack is healthy and run
+`dashboard/deployment/scripts/verify-online-mvp.sh`. Then provision both gateway
+headers, map every physical board to a COM port yourself, and never infer a port from
+enumeration. Flash the gateway first, then the three nodes. These commands are
+examples only and are not run by the integration smoke:
 
 ```powershell
 .\.venv-firmware\Scripts\pio.exe run -d firmware/gateway -e esp32dev-field -t upload --upload-port COM_X
@@ -49,7 +53,9 @@ are not run by the integration smoke:
 ```
 
 After each manual upload, use 115200 baud only on the explicitly mapped port. Confirm
-the gateway joins 2.4 GHz Wi-Fi on channel 6 before powering the nodes.
+the gateway joins 2.4 GHz Wi-Fi on channel 6, obtains UTC, connects through verified
+MQTTS, and publishes retained `ONLINE` before powering the nodes. Then verify backend
+LIVE mode, node heartbeats, and telemetry.
 
 ## Local broker, backend, and smoke
 
@@ -117,11 +123,12 @@ then REST. Do not change contracts to work around wiring or provisioning errors.
 
 Use only these hardware result labels:
 
-- `PASSED`
+- `VERIFIED`
 - `FAILED`
 - `NOT_RUN_NO_DEVICE`
 - `NOT_RUN_DEVICE_MAPPING_REQUIRED`
 - `NOT_RUN_MISSING_FIELD_CONFIG`
-- `NOT_RUN_DOCKER_UNAVAILABLE`
+- `NOT_RUN_MISSING_CA`
+- `NOT_RUN_USER_FLASH_REQUIRED`
 
 No device discovery command, smoke script, or CI job performs automatic flashing.

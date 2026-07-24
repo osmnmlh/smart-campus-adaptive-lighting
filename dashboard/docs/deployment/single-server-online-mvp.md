@@ -63,16 +63,23 @@ container health, and checks `https://APP_DOMAIN/health` for at most 90 seconds.
 issuance requires working DNS and public port `80`; Traefik persists ACME state in the
 `traefik_acme` named volume.
 
-Verify externally:
+Run the bounded, read-only external verification from `dashboard/deployment`:
 
 ```sh
-curl --fail https://APP_DOMAIN/health
-openssl s_client -connect MQTT_DOMAIN:8883 -servername MQTT_DOMAIN </dev/null
+./scripts/verify-online-mvp.sh
 ```
 
-Configure the gateway with host `MQTT_DOMAIN`, port `8883`, TLS enabled, the gateway username and
-password, and normal server-certificate validation. The backend uses only the private
-`mqtt://mosquitto:1883` hop.
+It reads `.env.production`, applies per-step timeouts, checks DNS, `/health`, `/`, `/metrics`,
+HTTPS and MQTTS certificate/hostname verification, and confirms public port `1883` is closed. It
+never prints credentials. `RUN_AUTHENTICATED_MQTT_SMOKE=1` performs safe static authentication
+and ACL checks only: the production ACL intentionally has no disposable test topic and is not
+widened for a smoke test.
+
+Configure the gateway with an `mqtts://MQTT_DOMAIN:8883` URI, the gateway username/password, and
+the trusted issuer CA in the ignored `gateway_tls_ca.hpp`. Field firmware rejects plaintext,
+missing credentials, and missing or placeholder CA material before creating the MQTT client.
+Certificate-chain and hostname verification are mandatory. CA rotation requires a field rebuild
+and manual gateway flash. The backend uses only the private `mqtt://mosquitto:1883` hop.
 
 ## Operations
 

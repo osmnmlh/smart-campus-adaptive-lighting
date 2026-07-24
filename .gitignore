@@ -47,6 +47,7 @@ firmware/**/.pio/
 firmware/**/coverage/
 firmware/**/test-output/
 firmware/**/gateway_secrets.hpp
+firmware/**/gateway_tls_ca.hpp
 firmware/**/node_secrets.hpp
 firmware/integration/gateway-local.hpp
 firmware/integration/node-peers.hpp

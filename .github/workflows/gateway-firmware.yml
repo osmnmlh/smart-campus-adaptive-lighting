@@ -21,6 +21,7 @@ jobs:
       - run: python -m pip install platformio==6.1.19
       - run: pio test -d firmware/gateway -e native
       - run: pio run -d firmware/gateway -e esp32dev-ci
+      - run: pio run -d firmware/gateway -e esp32dev-tls-ci
       - run: pio test -d firmware/node -e native
       - run: pio run -d firmware/node -e node1-ci
       - run: pio run -d firmware/node -e node2-ci

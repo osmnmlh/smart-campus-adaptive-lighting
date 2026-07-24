@@ -8,6 +8,7 @@
 #include "gateway_core/boot_counter.hpp"
 #include "gateway_core/bounded_queue.hpp"
 #include "gateway_core/gateway_core.hpp"
+#include "gateway_core/mqtt_policy.hpp"
 #include "gateway_core/outbox.hpp"
 #include "gateway_core/peer_registry.hpp"
 #include "gateway_core/readiness.hpp"
@@ -29,6 +30,10 @@ const MacAddress kMac1{0x02, 0, 0, 0, 0, 1};
 const MacAddress kMac2{0x02, 0, 0, 0, 0, 2};
 const MacAddress kMac3{0x02, 0, 0, 0, 0, 3};
 const MacAddress kUnknown{0x02, 0, 0, 0, 0, 9};
+constexpr const char* kWellFormedCa =
+    "-----BEGIN CERTIFICATE-----\n"
+    "dGVzdC1vbmx5LWNh\n"
+    "-----END CERTIFICATE-----\n";
 const std::array<Peer, 3> kLabPeers{{
     {NodeId::NODE_1, kMac1, false},
     {NodeId::NODE_2, kMac2, false},
@@ -85,6 +90,183 @@ class FakeStore : public BootCounterStore {
 
 #define BOOL_TEST(name, expression) \
   void name() { TEST_ASSERT_TRUE(expression); }
+
+void test_mqtt_lab_plaintext_allowed_but_not_deployable() {
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::LAB, "mqtt://192.0.2.1:1883", "", "", nullptr});
+  TEST_ASSERT_TRUE(result);
+  TEST_ASSERT_FALSE(result.tls_enabled);
+  TEST_ASSERT_FALSE(result.deployable);
+}
+void test_mqtt_lab_tls_with_ca_allowed_but_not_deployable() {
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::LAB, "mqtts://broker.invalid:8883", "", "",
+       kWellFormedCa});
+  TEST_ASSERT_TRUE(result);
+  TEST_ASSERT_TRUE(result.tls_enabled);
+  TEST_ASSERT_FALSE(result.deployable);
+}
+void test_mqtt_lab_tls_requires_ca() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::MISSING_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::LAB,
+                            "mqtts://broker.invalid:8883", "", "", nullptr})
+                           .error));
+}
+void test_mqtt_lab_plaintext_rejects_ca() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::PLAINTEXT_WITH_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::LAB,
+                            "mqtt://192.0.2.1:1883", "", "", kWellFormedCa})
+                           .error));
+}
+void test_mqtt_field_rejects_plaintext() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::FIELD_REQUIRES_MQTTS),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtt://broker.invalid:1883", "gateway", "secret",
+                            kWellFormedCa})
+                           .error));
+}
+void test_mqtt_field_tls_is_deployable() {
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::FIELD, "mqtts://broker.invalid:8883", "gateway",
+       "secret", kWellFormedCa});
+  TEST_ASSERT_TRUE(result);
+  TEST_ASSERT_TRUE(result.tls_enabled);
+  TEST_ASSERT_TRUE(result.deployable);
+}
+void test_mqtt_field_requires_username() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::MISSING_USERNAME),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "", "secret",
+                            kWellFormedCa})
+                           .error));
+}
+void test_mqtt_field_requires_password() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::MISSING_PASSWORD),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "",
+                            kWellFormedCa})
+                           .error));
+}
+void test_mqtt_field_requires_ca() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::MISSING_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "secret",
+                            nullptr})
+                           .error));
+}
+void test_mqtt_rejects_malformed_ca() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::INVALID_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "secret",
+                            "not-a-pem"})
+                           .error));
+}
+void test_mqtt_rejects_ca_without_begin_marker() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::INVALID_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "secret",
+                            "dGVzdA==\n-----END CERTIFICATE-----"})
+                           .error));
+}
+void test_mqtt_rejects_ca_without_end_marker() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::INVALID_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "secret",
+                            "-----BEGIN CERTIFICATE-----\ndGVzdA=="})
+                           .error));
+}
+void test_mqtt_rejects_placeholder_ca() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::PLACEHOLDER_CA_CERTIFICATE),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://broker.invalid:8883", "gateway", "secret",
+                            "REPLACE_WITH_TRUSTED_CA_CERTIFICATE"})
+                           .error));
+}
+void test_mqtt_rejects_embedded_credentials() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::EMBEDDED_CREDENTIALS),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::FIELD,
+                            "mqtts://gateway:secret@broker.invalid:8883",
+                            "gateway", "secret", kWellFormedCa})
+                           .error));
+}
+void test_mqtt_rejects_unsupported_scheme() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::UNSUPPORTED_SCHEME),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::LAB,
+                            "ws://broker.invalid:80", "", "", nullptr})
+                           .error));
+}
+void test_mqtt_rejects_empty_uri() {
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::MISSING_URI),
+      static_cast<int>(validate_mqtt_policy(
+                           {MqttDeploymentProfile::LAB, "", "", "", nullptr})
+                           .error));
+}
+void test_mqtt_ci_plaintext_is_explicitly_not_deployable() {
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::CI, "mqtt://192.0.2.1:1883", "", "", nullptr});
+  TEST_ASSERT_TRUE(result);
+  TEST_ASSERT_FALSE(result.deployable);
+}
+void test_mqtt_ci_tls_placeholder_is_rejected() {
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::CI, "mqtts://mqtt.ci.invalid:8883", "ci", "ci",
+       "-----BEGIN CERTIFICATE-----\nPLACEHOLDER\n-----END CERTIFICATE-----"});
+  TEST_ASSERT_EQUAL_INT(
+      static_cast<int>(MqttPolicyError::PLACEHOLDER_CA_CERTIFICATE),
+      static_cast<int>(result.error));
+  TEST_ASSERT_FALSE(result.deployable);
+}
+void test_mqtt_policy_does_not_mutate_input() {
+  char uri[] = "mqtts://broker.invalid:8883";
+  char username[] = "gateway";
+  char password[] = "secret";
+  char ca[] =
+      "-----BEGIN CERTIFICATE-----\n"
+      "dGVzdC1vbmx5LWNh\n"
+      "-----END CERTIFICATE-----\n";
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::FIELD, uri, username, password, ca});
+  TEST_ASSERT_TRUE(result);
+  TEST_ASSERT_EQUAL_STRING("mqtts://broker.invalid:8883", uri);
+  TEST_ASSERT_EQUAL_STRING("gateway", username);
+  TEST_ASSERT_EQUAL_STRING("secret", password);
+  TEST_ASSERT_EQUAL_STRING(kWellFormedCa, ca);
+}
+void test_mqtt_safe_diagnostic_does_not_project_secret() {
+  constexpr const char* kSecret = "super-secret-password";
+  const auto result = validate_mqtt_policy(
+      {MqttDeploymentProfile::FIELD, "mqtts://broker.invalid:8883", "gateway",
+       kSecret, nullptr});
+  const char* diagnostic = mqtt_policy_error_message(result.error);
+  TEST_ASSERT_NOT_NULL(diagnostic);
+  TEST_ASSERT_NULL(std::strstr(diagnostic, kSecret));
+  TEST_ASSERT_NULL(std::strstr(diagnostic, "gateway.invalid"));
+}
 
 BOOL_TEST(test_node_1_valid, is_valid(NodeId::NODE_1))
 BOOL_TEST(test_node_2_valid, is_valid(NodeId::NODE_2))
@@ -506,6 +688,26 @@ void test_boot_counter_uses_documented_keys() {
 
 int main(int, char**) {
   UNITY_BEGIN();
+  RUN_TEST(test_mqtt_lab_plaintext_allowed_but_not_deployable);
+  RUN_TEST(test_mqtt_lab_tls_with_ca_allowed_but_not_deployable);
+  RUN_TEST(test_mqtt_lab_tls_requires_ca);
+  RUN_TEST(test_mqtt_lab_plaintext_rejects_ca);
+  RUN_TEST(test_mqtt_field_rejects_plaintext);
+  RUN_TEST(test_mqtt_field_tls_is_deployable);
+  RUN_TEST(test_mqtt_field_requires_username);
+  RUN_TEST(test_mqtt_field_requires_password);
+  RUN_TEST(test_mqtt_field_requires_ca);
+  RUN_TEST(test_mqtt_rejects_malformed_ca);
+  RUN_TEST(test_mqtt_rejects_ca_without_begin_marker);
+  RUN_TEST(test_mqtt_rejects_ca_without_end_marker);
+  RUN_TEST(test_mqtt_rejects_placeholder_ca);
+  RUN_TEST(test_mqtt_rejects_embedded_credentials);
+  RUN_TEST(test_mqtt_rejects_unsupported_scheme);
+  RUN_TEST(test_mqtt_rejects_empty_uri);
+  RUN_TEST(test_mqtt_ci_plaintext_is_explicitly_not_deployable);
+  RUN_TEST(test_mqtt_ci_tls_placeholder_is_rejected);
+  RUN_TEST(test_mqtt_policy_does_not_mutate_input);
+  RUN_TEST(test_mqtt_safe_diagnostic_does_not_project_secret);
   RUN_TEST(test_node_1_valid); RUN_TEST(test_node_2_valid); RUN_TEST(test_node_3_valid);
   RUN_TEST(test_node_zero_invalid); RUN_TEST(test_node_four_invalid);
   RUN_TEST(test_heartbeat_type_valid); RUN_TEST(test_sensor_type_valid);

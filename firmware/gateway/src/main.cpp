@@ -13,6 +13,7 @@
 #include "gateway_core/boot_counter.hpp"
 #include "gateway_core/bounded_queue.hpp"
 #include "gateway_core/gateway_core.hpp"
+#include "gateway_core/mqtt_policy.hpp"
 #include "gateway_core/outbox.hpp"
 #include "gateway_core/readiness.hpp"
 #include "mqtt_serialization.hpp"
@@ -180,13 +181,37 @@ void on_mqtt_event(void*, esp_event_base_t, std::int32_t event_id, void* event_d
       if (event != nullptr && event->msg_id > 0)
         outbox.acknowledge(static_cast<std::uint32_t>(event->msg_id));
       break;
+    case MQTT_EVENT_ERROR:
+      if (event == nullptr || event->error_handle == nullptr) {
+        safe_log("gateway: MQTT connection failed");
+      } else if (event->error_handle->esp_tls_cert_verify_flags != 0) {
+        safe_log("gateway: MQTT TLS certificate verification failed");
+      } else if (event->error_handle->error_type ==
+                 MQTT_ERROR_TYPE_CONNECTION_REFUSED) {
+        safe_log("gateway: MQTT broker rejected the connection");
+      } else {
+        safe_log("gateway: MQTT TLS or transport connection failed");
+      }
+      break;
     default:
       break;
   }
 }
 
 bool start_mqtt() {
-  if (!readiness.utc_ready || mqtt_started) return mqtt_started;
+  if (mqtt_started) return true;
+  if (!readiness.wifi_connected || !readiness.channel_aligned ||
+      !readiness.esp_now_ready || !readiness.peers_registered ||
+      !readiness.utc_ready)
+    return false;
+  const gateway_core::MqttPolicyResult policy =
+      gateway_core::validate_mqtt_policy(
+          {gateway_config::kMqttDeploymentProfile, SC_MQTT_URI, SC_MQTT_USERNAME,
+           SC_MQTT_PASSWORD, gateway_config::kMqttCaCertificatePem});
+  if (!policy) {
+    safe_log(gateway_core::mqtt_policy_error_message(policy.error));
+    return false;
+  }
   char timestamp[32]{};
   if (!gateway_mqtt::format_utc(epoch_ms_now(), timestamp, sizeof(timestamp))) return false;
   if (!gateway_mqtt::serialize_status(gateway_boot_id.c_str(), "OFFLINE", millis(),
@@ -199,6 +224,9 @@ bool start_mqtt() {
   config.client_id = "GW_1";
   config.username = SC_MQTT_USERNAME[0] == '\0' ? nullptr : SC_MQTT_USERNAME;
   config.password = SC_MQTT_PASSWORD[0] == '\0' ? nullptr : SC_MQTT_PASSWORD;
+  config.cert_pem =
+      policy.tls_enabled ? gateway_config::kMqttCaCertificatePem : nullptr;
+  config.cert_len = 0;
   config.lwt_topic = gateway_config::kStatusTopic;
   config.lwt_msg = last_will_json.c_str();
   config.lwt_msg_len = last_will_json.length();
