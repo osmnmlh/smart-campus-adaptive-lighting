@@ -3,16 +3,24 @@ import type { OverviewModel } from '@/features/overview/overview-model';
 
 type DataSourceNoticeProps = Readonly<{
   model: Pick<OverviewModel, 'dataSource'>;
+  live?: boolean;
 }>;
 
-export function DataSourceNotice({ model }: DataSourceNoticeProps) {
+export function DataSourceNotice({ model, live = false }: DataSourceNoticeProps) {
   return (
     <aside className="data-source-notice" aria-label="Data source notice">
-      <StatusBadge label="Mock Data" tone="neutral" />
-      <p>
-        Deterministic <strong>{model.dataSource}</strong> fixture gösteriliyor. Backend bağlantısı
-        henüz aktif değil.
-      </p>
+      <StatusBadge label={live ? 'Backend Data' : 'Mock Data'} tone={live ? 'ready' : 'neutral'} />
+      {live ? (
+        <p>
+          Backend transportundan doğrulanan <strong>{model.dataSource}</strong> snapshot
+          gösteriliyor.
+        </p>
+      ) : (
+        <p>
+          Deterministic <strong>{model.dataSource}</strong> fixture gösteriliyor. Backend bağlantısı
+          henüz aktif değil.
+        </p>
+      )}
     </aside>
   );
 }

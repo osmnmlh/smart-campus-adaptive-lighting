@@ -23,7 +23,8 @@ import {
 
 export function MetricsDashboard({
   initialState,
-}: Readonly<{ initialState: MetricsDashboardState }>) {
+  live = false,
+}: Readonly<{ initialState: MetricsDashboardState; live?: boolean }>) {
   const [selectedLampId, setSelectedLampId] = useState('lamp-2');
   const [selectedSensorId, setSelectedSensorId] = useState('sensor-ir-2');
   const [timeRange, setTimeRange] = useState<TimeRange>('15m');
@@ -46,7 +47,11 @@ export function MetricsDashboard({
 
   return (
     <div className="metrics-dashboard">
-      <MetricsHeader snapshotAt={model?.fixtureEnd ?? null} />
+      <MetricsHeader
+        snapshotAt={model?.fixtureEnd ?? null}
+        live={live}
+        sampleCount={model?.lamps[0]?.points.length ?? 0}
+      />
       {initialState.status !== 'ready' || !model || !selection ? (
         <MetricsEmptyState
           title={
@@ -92,14 +97,16 @@ export function MetricsDashboard({
             <p className="eyebrow">Unavailable metric family</p>
             <h2 id="electrical-state-title">Electrical metrics not available</h2>
             <p>
-              INA219 current, voltage, and power data are not provided in this simulated fixture. No
-              electrical, savings, cost, or carbon values are inferred.
+              INA219 current, voltage, and power data are not provided in the current dashboard
+              dataset. No electrical, savings, cost, or carbon values are inferred.
             </p>
           </section>
 
           <MetricsDataTable
             rows={selection.rows}
-            caption={`${selectedLampId}, ${selectedSensorId}, ${timeRange} simulated metric points; newest rows first.`}
+            caption={`${selectedLampId}, ${selectedSensorId}, ${timeRange} ${
+              live ? 'live session' : 'simulated'
+            } metric points; newest rows first.`}
           />
         </>
       )}

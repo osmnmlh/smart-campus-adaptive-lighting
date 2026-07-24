@@ -21,20 +21,35 @@ import {
 
 export function AlertsDashboard({
   rawAlerts = activityFixture.alerts,
-}: Readonly<{ rawAlerts?: readonly unknown[] }>) {
-  const result = adaptAlerts(rawAlerts);
+  live = false,
+  windowEnd = activityFixture.windowEnd,
+  transportError = null,
+}: Readonly<{
+  rawAlerts?: readonly unknown[];
+  live?: boolean;
+  windowEnd?: string | null;
+  transportError?: string | null;
+}>) {
+  const result = adaptAlerts(rawAlerts, { live });
   const [filters, setFilters] = useState<AlertFilters>(DEFAULT_ALERT_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterError, setFilterError] = useState<string | null>(null);
-  if (!result.ok)
+  if (transportError !== null || !result.ok)
     return (
       <div className="activity-dashboard">
-        <AlertsHeader />
-        <AlertsErrorState message={result.error.message} />
+        <AlertsHeader live={live} />
+        <AlertsErrorState
+          message={transportError ?? (!result.ok ? result.error.message : '')}
+          live={live}
+        />
       </div>
     );
   const entities = getAvailableAlertEntities(result.records);
-  const filtered = applyAlertFilters(result.records, filters, activityFixture.windowEnd);
+  const filtered = applyAlertFilters(
+    result.records,
+    filters,
+    windowEnd ?? new Date().toISOString(),
+  );
   const selected = selectedId === null ? null : getAlertById(result.records, selectedId);
   const updateFilter = (field: keyof AlertFilters, value: unknown) => {
     const parsed = parseAlertFilters({ ...filters, [field]: value }, entities);
@@ -51,7 +66,7 @@ export function AlertsDashboard({
   };
   return (
     <div className="activity-dashboard">
-      <AlertsHeader />
+      <AlertsHeader live={live} />
       <AlertsSummary summary={getAlertSummary(result.records)} />
       <AlertsFilters
         filters={filters}
@@ -77,7 +92,11 @@ export function AlertsDashboard({
         <div className="activity-workspace">
           <div>
             {filtered.length === 0 ? (
-              <AlertsEmptyState fixtureEmpty={result.records.length === 0} onClear={clearFilters} />
+              <AlertsEmptyState
+                fixtureEmpty={result.records.length === 0}
+                onClear={clearFilters}
+                live={live}
+              />
             ) : (
               <AlertsTable records={filtered} selectedId={selectedId} onSelect={setSelectedId} />
             )}

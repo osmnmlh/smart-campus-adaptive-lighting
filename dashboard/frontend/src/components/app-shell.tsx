@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AppNavigation } from './app-navigation';
+import { DashboardConnectionStatus } from './dashboard-connection-status';
 
 type AppShellProps = Readonly<{
   children: ReactNode;
@@ -14,6 +15,7 @@ export function AppShell({ children }: AppShellProps) {
             <span className="brand-mark" aria-hidden="true" />
             <span>Smart Campus Adaptive Lighting Dashboard</span>
           </div>
+          <DashboardConnectionStatus />
           <AppNavigation />
         </div>
       </header>

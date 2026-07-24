@@ -1,9 +1,22 @@
+'use client';
+
 import { MetricsDashboard } from '@/components/metrics/metrics-dashboard';
 import { createMetricsDashboardState } from '@/features/metrics/metrics-adapter';
 import { metricsTelemetryFixture } from '@/features/metrics/metrics-fixture';
-
-const metricsState = createMetricsDashboardState(metricsTelemetryFixture);
+import { useDashboardData } from '@/features/live-data/dashboard-data-provider';
+import { createLiveMetricsDashboardState } from '@/features/live-data/live-metrics-adapter';
 
 export default function MetricsPage() {
-  return <MetricsDashboard initialState={metricsState} />;
+  const state = useDashboardData();
+  const live = state.configuredMode === 'live';
+  return (
+    <MetricsDashboard
+      initialState={
+        live
+          ? createLiveMetricsDashboardState(state.snapshotHistory)
+          : createMetricsDashboardState(metricsTelemetryFixture)
+      }
+      live={live}
+    />
+  );
 }

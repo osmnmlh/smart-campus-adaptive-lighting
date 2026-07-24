@@ -11,10 +11,16 @@ export function EnvironmentStatus() {
       <header className="environment-header">
         <p className="eyebrow">Çalışma ortamı</p>
         <h2 id="environment-title">Bağlantı yapılandırması</h2>
-        <p>Bu adresler public frontend yapılandırmasıdır; henüz ağ bağlantısı kurulmaz.</p>
+        <p>Bu değerler public frontend veri modu ve bağlantı yapılandırmasıdır.</p>
       </header>
 
       <dl className="environment-list">
+        <div className="environment-item">
+          <dt>Data mode</dt>
+          <dd>
+            <code>{publicEnv.dataMode}</code>
+          </dd>
+        </div>
         <div className="environment-item">
           <dt>API URL</dt>
           <dd>

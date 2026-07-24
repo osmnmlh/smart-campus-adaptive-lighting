@@ -2972,6 +2972,15 @@ h3 {
   font-size: 0.72rem;
 }
 
+.dashboard-connection-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--slate-500);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
 .activity-empty,
 .activity-error {
   min-height: 260px;
