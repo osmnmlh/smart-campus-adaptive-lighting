@@ -1,0 +1,85 @@
+name: Deployment build
+
+on:
+  push:
+    branches:
+      - main
+      - feat/single-server-online-deployment-mvp
+    paths:
+      - dashboard/deployment/**
+      - dashboard/.dockerignore
+      - dashboard/.gitignore
+      - dashboard/frontend/next.config.ts
+      - dashboard/package-lock.json
+      - .github/workflows/deployment-build.yml
+  pull_request:
+    paths:
+      - dashboard/deployment/**
+      - dashboard/.dockerignore
+      - dashboard/.gitignore
+      - dashboard/frontend/next.config.ts
+      - dashboard/package-lock.json
+      - .github/workflows/deployment-build.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      COMPOSE_PROJECT_NAME: smart-campus-ci
+      IMAGE_TAG: ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare non-secret CI deployment inputs
+        working-directory: dashboard/deployment
+        run: |
+          cp .env.production.example .env.production
+          sed -i 's/dashboard\.example\.com/dashboard.ci.invalid/' .env.production
+          sed -i 's/mqtt\.example\.com/mqtt.ci.invalid/' .env.production
+          sed -i 's/ops@example\.com/ci@smart-campus.invalid/' .env.production
+          sed -i 's/CHANGE_ME_BACKEND_MQTT_PASSWORD/ci-backend-password/' .env.production
+          sed -i 's/CHANGE_ME_GATEWAY_MQTT_PASSWORD/ci-gateway-password/' .env.production
+          mkdir -p secrets/mosquitto
+          printf 'ci-only-placeholder\n' >secrets/mosquitto/passwords
+
+      - name: Validate deployment contract
+        run: dashboard/deployment/scripts/validate-deployment.sh
+
+      - name: Build production images
+        working-directory: dashboard/deployment
+        run: docker compose --env-file .env.production -f compose.production.yaml build frontend backend
+
+      - name: Smoke production images
+        run: |
+          docker run -d --name frontend-smoke -p 127.0.0.1:13000:3000 smart-campus-ci-frontend:ci
+          docker run -d --name backend-smoke -p 127.0.0.1:13001:3001 \
+            -e NODE_ENV=production \
+            -e BACKEND_HOST=0.0.0.0 \
+            -e BACKEND_PORT=3001 \
+            -e MQTT_ENABLED=false \
+            -e WEBSOCKET_ALLOWED_ORIGINS=http://127.0.0.1:13000 \
+            smart-campus-ci-backend:ci
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:13000/ >/dev/null && break
+            test "$attempt" -lt 30
+            sleep 2
+          done
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:13001/health >/dev/null && break
+            test "$attempt" -lt 30
+            sleep 2
+          done
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          docker logs frontend-smoke || true
+          docker logs backend-smoke || true
+
+      - name: Clean up smoke containers
+        if: always()
+        run: docker rm -f frontend-smoke backend-smoke || true
