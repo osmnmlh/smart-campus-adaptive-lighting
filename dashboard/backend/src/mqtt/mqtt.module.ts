@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { loadEnvironment } from '../common/config/environment.js';
 import { ReadModelModule } from '../modules/read-model/read-model.module.js';
+import { EnergyModule } from '../modules/energy/energy.module.js';
 import { RealtimeModule } from '../realtime/realtime.module.js';
 import { GatewaySequenceTracker } from './application/gateway-sequence-tracker.js';
 import { MqttDiagnosticsService } from './application/mqtt-diagnostics.service.js';
@@ -22,7 +23,7 @@ import { MqttJsClientAdapter } from './infrastructure/mqtt-js-client.adapter.js'
 import { MqttJsClientFactory } from './infrastructure/mqtt-js-client.factory.js';
 
 @Module({
-  imports: [ReadModelModule, RealtimeModule],
+  imports: [ReadModelModule, RealtimeModule, EnergyModule],
   providers: [
     { provide: MQTT_CONFIG, useFactory: loadEnvironment },
     MqttJsClientFactory,

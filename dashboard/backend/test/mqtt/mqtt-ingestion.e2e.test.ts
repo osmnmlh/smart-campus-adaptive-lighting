@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import type { INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import {
+  EnergyAnalyticsSummarySchema,
   RealtimeServerMessageV1Schema,
   SystemSnapshotSchema,
   UtcTimestampSchema,
@@ -202,6 +203,11 @@ describe('MQTT ingestion integration', () => {
     return SystemSnapshotSchema.parse((response.body as { data: unknown }).data);
   };
 
+  const currentEnergy = async () => {
+    const response = await request(app.getHttpServer()).get('/api/v1/energy/summary').expect(200);
+    return EnergyAnalyticsSummarySchema.parse((response.body as { data: unknown }).data);
+  };
+
   const eventsAfter = (cursor: number): readonly RealtimeDomainEventV1[] => {
     const replay = stream.replayAfter(cursor);
     if (replay.kind !== 'REPLAY') throw new Error(`Expected replay, received ${replay.kind}`);
@@ -355,6 +361,60 @@ describe('MQTT ingestion integration', () => {
       power: { value: 6, unit: 'W', source: 'MEASURED' },
       energy: { value: 1.25, unit: 'Wh', source: 'MEASURED' },
     });
+  });
+
+  it('serves a contract-valid session-only energy summary', async () => {
+    const summary = await currentEnergy();
+    expect(summary).toMatchObject({
+      nominalLampPowerW: 10,
+      totalLampCount: 5,
+      measuredLampCount: 0,
+      estimatedLampCount: 5,
+      currentReferencePowerW: 50,
+      dataSource: 'CALCULATED',
+      referenceDataSource: 'NOMINAL',
+      persistenceMode: 'SESSION_ONLY',
+    });
+  });
+
+  it('recalculates energy after an accepted lamp update', async () => {
+    const before = await currentEnergy();
+    mqtt.emitMessage(inboundNode(lampMessage()));
+    const after = await currentEnergy();
+    expect(after.currentActualPowerW).not.toBe(before.currentActualPowerW);
+    expect(after.lamps.find((lamp) => lamp.lampId === 'lamp-3')).toMatchObject({
+      brightnessPercent: 60,
+      dataSource: 'ESTIMATED',
+    });
+  });
+
+  it('uses accepted fresh electrical power only for L3', async () => {
+    mqtt.emitMessage(inboundNode(electricalMessage()));
+    const summary = await currentEnergy();
+    expect(summary.measuredLampCount).toBe(1);
+    expect(summary.measurementCoveragePercent).toBe(20);
+    expect(summary.lamps.find((lamp) => lamp.lampId === 'lamp-3')).toMatchObject({
+      currentPowerW: 6,
+      dataSource: 'MEASURED',
+      measurementFresh: true,
+    });
+    expect(
+      summary.lamps
+        .filter((lamp) => lamp.lampId !== 'lamp-3')
+        .every((lamp) => lamp.dataSource === 'ESTIMATED'),
+    ).toBe(true);
+  });
+
+  it('does not change energy after an invalid MQTT message', async () => {
+    const before = await currentEnergy();
+    expect(
+      ingestion.ingest(
+        inboundNode(lampMessage(), {
+          topic: 'smart-campus/v1/nodes/NODE_1/telemetry',
+        }),
+      ),
+    ).toBe('REJECTED');
+    expect(await currentEnergy()).toEqual(before);
   });
 
   it('enters LIVE only after broker, gateway and all three nodes are online', () => {
@@ -540,6 +600,7 @@ describe('MQTT ingestion integration', () => {
       '/api/v1/alerts',
       '/api/v1/logs',
       '/api/v1/scenarios',
+      '/api/v1/energy/summary',
     ]) {
       await request(app.getHttpServer()).get(path).expect(200);
     }
@@ -577,6 +638,17 @@ describe('MQTT ingestion integration', () => {
     const cursor = stream.getCurrentCursor();
     ingestion.ingest({ ...message, dup: true });
     expect(eventsAfter(cursor)).toEqual([]);
+  });
+
+  it('publishes a typed energy event after a lamp mutation and none for its QoS duplicate', () => {
+    const message = inboundNode(lampMessage());
+    const cursor = stream.getCurrentCursor();
+    expect(ingestion.ingest(message)).toBe('ACCEPTED');
+    const events = eventsAfter(cursor);
+    expect(events.map((event) => event.eventType)).toContain('ENERGY_ANALYTICS_UPDATED');
+    const afterAccepted = stream.getCurrentCursor();
+    expect(ingestion.ingest({ ...message, dup: true })).toBe('DUPLICATE');
+    expect(eventsAfter(afterAccepted)).toEqual([]);
   });
 
   it('keeps an accepted read-model update when realtime publication fails', async () => {

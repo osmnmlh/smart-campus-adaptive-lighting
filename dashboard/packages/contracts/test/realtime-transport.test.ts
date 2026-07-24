@@ -15,6 +15,7 @@ import {
   RealtimeStreamIdSchema,
   RequestSnapshotMessageV1Schema,
   ResumeMessageV1Schema,
+  EnergyAnalyticsSummarySchema,
 } from '../src/index.js';
 import {
   lampSnapshot,
@@ -56,6 +57,40 @@ const connectionState = {
   onlineNodeIds: ['NODE_1', 'NODE_2', 'NODE_3'],
   changedAt: timestamp,
 } as const;
+const energySummary = EnergyAnalyticsSummarySchema.parse({
+  calculatedAt: timestamp,
+  sessionStartedAt: timestamp,
+  sessionDurationSeconds: 0,
+  nominalLampPowerW: 10,
+  measuredLampCount: 0,
+  estimatedLampCount: 1,
+  simulatedLampCount: 0,
+  totalLampCount: 1,
+  measurementCoveragePercent: 0,
+  currentActualPowerW: 3,
+  currentReferencePowerW: 10,
+  currentSavedPowerW: 7,
+  currentSavingsPercent: 70,
+  actualSessionEnergyWh: 0,
+  referenceSessionEnergyWh: 0,
+  savedSessionEnergyWh: 0,
+  sessionSavingsPercent: 0,
+  lamps: [
+    {
+      lampId: 'lamp-1',
+      brightnessPercent: 30,
+      currentPowerW: 3,
+      dataSource: 'ESTIMATED',
+      measurementFresh: false,
+    },
+  ],
+  dataSource: 'CALCULATED',
+  referenceDataSource: 'NOMINAL',
+  savingsDataSource: 'CALCULATED',
+  quality: 'GOOD',
+  limitationCode: null,
+  persistenceMode: 'SESSION_ONLY',
+});
 
 const eventDrafts = [
   { eventType: 'SYSTEM_SNAPSHOT_UPDATED', payload: systemSnapshot },
@@ -65,6 +100,7 @@ const eventDrafts = [
   { eventType: 'ALERT_UPSERTED', payload: alert },
   { eventType: 'LOG_APPENDED', payload: log },
   { eventType: 'SYSTEM_CONNECTION_UPDATED', payload: connectionState },
+  { eventType: 'ENERGY_ANALYTICS_UPDATED', payload: energySummary },
 ] as const;
 
 const eventFrom = (draft: (typeof eventDrafts)[number]) => ({

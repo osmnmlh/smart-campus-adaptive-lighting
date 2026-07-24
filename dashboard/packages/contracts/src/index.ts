@@ -114,6 +114,19 @@ export type { Alert } from './alerts/alert.schema.js';
 export { EventLogSchema, EventType, EventTypeSchema } from './alerts/event-log.schema.js';
 export type { EventLog } from './alerts/event-log.schema.js';
 
+export {
+  EnergyAnalyticsLimitationCodeSchema,
+  EnergyAnalyticsSummarySchema,
+  EnergyLampBreakdownSchema,
+  EnergyLampDataSourceSchema,
+} from './analytics/energy-analytics.schema.js';
+export type {
+  EnergyAnalyticsLimitationCode,
+  EnergyAnalyticsSummary,
+  EnergyLampBreakdown,
+  EnergyLampDataSource,
+} from './analytics/energy-analytics.schema.js';
+
 export { NodeSnapshotSchema } from './snapshots/node-snapshot.schema.js';
 export type { NodeSnapshot } from './snapshots/node-snapshot.schema.js';
 export { LampSnapshotSchema } from './snapshots/lamp-snapshot.schema.js';

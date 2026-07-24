@@ -3,12 +3,14 @@ import {
   EventLogSchema,
   type Alert,
   type EventLog,
+  type EnergyAnalyticsSummary,
   type RealtimeDataMode,
   type RealtimeDomainEventV1,
   type SystemSnapshot,
 } from '@smart-campus/contracts';
 import { activityFixture } from '@/features/activity/activity-fixture';
 import { overviewSnapshot } from '@/features/overview/overview-fixture';
+import { simulatedEnergySummary } from '@/features/metrics/energy-fixture';
 
 export type TransportStatus =
   'SIMULATED' | 'CONNECTING' | 'CONNECTED' | 'RECONNECTING' | 'DISCONNECTED' | 'ERROR';
@@ -18,6 +20,7 @@ export type LiveDataState = Readonly<{
   snapshot: SystemSnapshot | null;
   alerts: readonly Alert[];
   logs: readonly EventLog[];
+  energySummary: EnergyAnalyticsSummary | null;
   snapshotHistory: readonly SystemSnapshot[];
   backendDataMode: RealtimeDataMode;
   transportStatus: TransportStatus;
@@ -35,6 +38,7 @@ export type LiveDataAction =
       snapshot: SystemSnapshot;
       alerts: readonly Alert[];
       logs: readonly EventLog[];
+      energySummary: EnergyAnalyticsSummary;
     }>
   | Readonly<{ type: 'INITIAL_ERROR'; message: string }>
   | Readonly<{
@@ -119,6 +123,8 @@ function applyDomainEvent(snapshot: SystemSnapshot, event: RealtimeDomainEventV1
       };
     case 'SYSTEM_CONNECTION_UPDATED':
       return { ...snapshot, snapshotAt };
+    case 'ENERGY_ANALYTICS_UPDATED':
+      return snapshot;
   }
 }
 
@@ -128,6 +134,7 @@ export function createSimulatedLiveDataState(): LiveDataState {
     snapshot: overviewSnapshot,
     alerts: activityFixture.alerts.map((alert) => AlertSchema.parse(alert)),
     logs: activityFixture.logs.map((log) => EventLogSchema.parse(log)),
+    energySummary: simulatedEnergySummary,
     snapshotHistory: [overviewSnapshot],
     backendDataMode: 'SIMULATED',
     transportStatus: 'SIMULATED',
@@ -144,6 +151,7 @@ export function createLiveInitialState(): LiveDataState {
     snapshot: null,
     alerts: [],
     logs: [],
+    energySummary: null,
     snapshotHistory: [],
     backendDataMode: 'DISCONNECTED',
     transportStatus: 'DISCONNECTED',
@@ -175,6 +183,7 @@ export function liveDataReducer(state: LiveDataState, action: LiveDataAction): L
         snapshot: action.snapshot,
         alerts: [...action.alerts],
         logs: [...action.logs].slice(0, MAX_LOGS),
+        energySummary: action.energySummary,
         snapshotHistory: boundedHistory(state.snapshotHistory, action.snapshot),
         lastUpdatedAt: action.snapshot.snapshotAt,
         errorMessage: null,
@@ -231,11 +240,16 @@ export function liveDataReducer(state: LiveDataState, action: LiveDataAction): L
         action.event.eventType === 'SYSTEM_CONNECTION_UPDATED'
           ? action.event.payload.dataMode
           : state.backendDataMode;
+      const energySummary =
+        action.event.eventType === 'ENERGY_ANALYTICS_UPDATED'
+          ? action.event.payload
+          : state.energySummary;
       return {
         ...state,
         snapshot,
         alerts,
         logs,
+        energySummary,
         backendDataMode,
         latestSequence: action.event.sequence,
         lastUpdatedAt: action.event.occurredAt,

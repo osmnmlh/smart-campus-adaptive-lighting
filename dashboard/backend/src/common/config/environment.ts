@@ -14,6 +14,9 @@ const DEFAULT_MQTT_KEEPALIVE_SECONDS = 30;
 const DEFAULT_MQTT_MAX_PAYLOAD_BYTES = 16_384;
 const DEFAULT_MQTT_DEDUP_CAPACITY = 10_000;
 const DEFAULT_MQTT_LIVENESS_SWEEP_MS = 5_000;
+const DEFAULT_ENERGY_NOMINAL_LAMP_POWER_W = 10;
+const DEFAULT_ENERGY_MEASUREMENT_STALE_MS = 15_000;
+const DEFAULT_ENERGY_MAX_INTEGRATION_GAP_MS = 30_000;
 const VALID_NODE_ENVIRONMENTS = ['development', 'test', 'production'] as const;
 
 export type NodeEnvironment = (typeof VALID_NODE_ENVIRONMENTS)[number];
@@ -38,6 +41,9 @@ export interface EnvironmentConfig {
   mqttMaxPayloadBytes: number;
   mqttDedupCapacity: number;
   mqttLivenessSweepMs: number;
+  energyNominalLampPowerW: number;
+  energyMeasurementStaleMs: number;
+  energyMaxIntegrationGapMs: number;
 }
 
 function parseNodeEnvironment(value: string | undefined): NodeEnvironment {
@@ -191,6 +197,20 @@ function parseMqttInteger(
   return parsed;
 }
 
+function parsePositiveFiniteNumber(
+  name: string,
+  value: string | undefined,
+  defaultValue: number,
+  maximum: number,
+): number {
+  if (value === undefined || value === '') return defaultValue;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > maximum) {
+    throw new Error(`Invalid ${name}: expected a positive number no greater than ${maximum}`);
+  }
+  return parsed;
+}
+
 export function loadEnvironment(env: NodeJS.ProcessEnv = process.env): EnvironmentConfig {
   return {
     nodeEnv: parseNodeEnvironment(env.NODE_ENV),
@@ -257,6 +277,24 @@ export function loadEnvironment(env: NodeJS.ProcessEnv = process.env): Environme
       DEFAULT_MQTT_LIVENESS_SWEEP_MS,
       1,
       60_000,
+    ),
+    energyNominalLampPowerW: parsePositiveFiniteNumber(
+      'ENERGY_NOMINAL_LAMP_POWER_W',
+      env.ENERGY_NOMINAL_LAMP_POWER_W,
+      DEFAULT_ENERGY_NOMINAL_LAMP_POWER_W,
+      1_000,
+    ),
+    energyMeasurementStaleMs: parseBoundedInteger(
+      'ENERGY_MEASUREMENT_STALE_MS',
+      env.ENERGY_MEASUREMENT_STALE_MS,
+      DEFAULT_ENERGY_MEASUREMENT_STALE_MS,
+      3_600_000,
+    ),
+    energyMaxIntegrationGapMs: parseBoundedInteger(
+      'ENERGY_MAX_INTEGRATION_GAP_MS',
+      env.ENERGY_MAX_INTEGRATION_GAP_MS,
+      DEFAULT_ENERGY_MAX_INTEGRATION_GAP_MS,
+      300_000,
     ),
   };
 }

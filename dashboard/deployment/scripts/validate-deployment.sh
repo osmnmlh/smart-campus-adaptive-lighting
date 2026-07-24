@@ -116,6 +116,12 @@ grep -q 'MQTT_BROKER_URL: mqtt://mosquitto:1883' "$compose_file" ||
   fail "backend production environment is exact"
 grep -Fq 'WEBSOCKET_ALLOWED_ORIGINS: https://${APP_DOMAIN}' "$compose_file" ||
   fail "backend production environment is exact"
+grep -Fq 'ENERGY_NOMINAL_LAMP_POWER_W: ${ENERGY_NOMINAL_LAMP_POWER_W:-10}' "$compose_file" ||
+  fail "backend production environment is exact"
+grep -Fq 'ENERGY_MEASUREMENT_STALE_MS: ${ENERGY_MEASUREMENT_STALE_MS:-15000}' "$compose_file" ||
+  fail "backend production environment is exact"
+grep -Fq 'ENERGY_MAX_INTEGRATION_GAP_MS: ${ENERGY_MAX_INTEGRATION_GAP_MS:-30000}' "$compose_file" ||
+  fail "backend production environment is exact"
 pass "backend uses the internal broker and exact same-origin policy"
 
 grep -q '^allow_anonymous false$' "$deployment_dir/mosquitto/mosquitto.conf" ||

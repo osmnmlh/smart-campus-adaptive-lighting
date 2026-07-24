@@ -80,6 +80,24 @@ describe('RealtimeClient', () => {
     expect(test.callbacks.onMessage).not.toHaveBeenCalled();
   });
 
+  it('ignores an invalid energy event payload before it can reach state', () => {
+    const test = harness();
+    test.client.start();
+    test.sockets[0]?.emitMessage(
+      JSON.stringify({
+        messageType: 'DOMAIN_EVENT',
+        protocolVersion: 1,
+        streamId: 'WS_123e4567-e89b-12d3-a456-426614174000',
+        sequence: 1,
+        eventId: 'WS_123e4567-e89b-12d3-a456-426614174000:1',
+        occurredAt: '2026-06-15T20:31:00.000Z',
+        eventType: 'ENERGY_ANALYTICS_UPDATED',
+        payload: { currentActualPowerW: -1 },
+      }),
+    );
+    expect(test.callbacks.onMessage).not.toHaveBeenCalled();
+  });
+
   it('schedules 1s, 2s and 5s reconnects before readiness', () => {
     const test = harness();
     test.client.start();

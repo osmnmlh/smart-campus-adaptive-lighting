@@ -8,6 +8,7 @@ import {
 } from '@smart-campus/contracts';
 
 import type { EnvironmentConfig } from '../../common/config/environment.js';
+import { EnergyAnalyticsService } from '../../modules/energy/application/energy-analytics.service.js';
 import {
   LIVE_READ_MODEL_UPDATE,
   type LiveReadModelUpdatePort,
@@ -49,6 +50,7 @@ export class MqttIngestionService {
     @Inject(REALTIME_PUBLISHER) private readonly publisher: RealtimePublisherPort,
     private readonly runtimeState: MqttRuntimeStateService,
     private readonly diagnostics: MqttDiagnosticsService,
+    private readonly energyAnalytics: EnergyAnalyticsService,
   ) {}
 
   ingest(rawMessage: MqttInboundMessage): MqttIngestionOutcome {
@@ -140,6 +142,12 @@ export class MqttIngestionService {
     this.runtimeState.setNodeOnline(envelope.nodeMessage.nodeId, true);
 
     this.publish(mutation.primaryEvent);
+    if (
+      envelope.nodeMessage.messageType === 'LAMP_STATE' ||
+      envelope.nodeMessage.messageType === 'ELECTRICAL_MEASUREMENT'
+    ) {
+      this.energyAnalytics.refreshAndPublish();
+    }
     if (
       mutation.primaryEvent.eventType !== 'NODE_UPDATED' &&
       (decision.kind === 'GAP' ||

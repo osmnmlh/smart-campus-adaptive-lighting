@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AlertSchema } from '../../alerts/alert.schema.js';
 import { EventLogSchema } from '../../alerts/event-log.schema.js';
+import { EnergyAnalyticsSummarySchema } from '../../analytics/energy-analytics.schema.js';
 import { UtcTimestampSchema } from '../../common/timestamp.schema.js';
 import { LampSnapshotSchema } from '../../snapshots/lamp-snapshot.schema.js';
 import { NodeSnapshotSchema } from '../../snapshots/node-snapshot.schema.js';
@@ -21,6 +22,7 @@ export const RealtimeDomainEventTypeSchema = z.enum([
   'ALERT_UPSERTED',
   'LOG_APPENDED',
   'SYSTEM_CONNECTION_UPDATED',
+  'ENERGY_ANALYTICS_UPDATED',
 ]);
 export const RealtimeDomainEventType = RealtimeDomainEventTypeSchema.enum;
 
@@ -37,6 +39,12 @@ const domainEventDraftVariants = [
     .object({
       eventType: z.literal('SYSTEM_CONNECTION_UPDATED'),
       payload: RealtimeConnectionStateV1Schema,
+    })
+    .strict(),
+  z
+    .object({
+      eventType: z.literal('ENERGY_ANALYTICS_UPDATED'),
+      payload: EnergyAnalyticsSummarySchema,
     })
     .strict(),
 ] as const;
@@ -104,6 +112,13 @@ export const RealtimeDomainEventV1Schema = z
         ...domainEventEnvelope,
         eventType: z.literal('LOG_APPENDED'),
         payload: EventLogSchema,
+      })
+      .strict(),
+    z
+      .object({
+        ...domainEventEnvelope,
+        eventType: z.literal('ENERGY_ANALYTICS_UPDATED'),
+        payload: EnergyAnalyticsSummarySchema,
       })
       .strict(),
   ])

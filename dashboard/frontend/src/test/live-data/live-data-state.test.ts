@@ -6,6 +6,7 @@ import {
   type LiveDataState,
 } from '@/features/live-data/live-data-state';
 import { overviewSnapshot } from '@/features/overview/overview-fixture';
+import { simulatedEnergySummary } from '@/features/metrics/energy-fixture';
 
 const streamId = 'WS_123e4567-e89b-12d3-a456-426614174000';
 const occurredAt = '2026-06-15T20:31:00.000Z';
@@ -16,6 +17,7 @@ function readyState(): LiveDataState {
     snapshot: overviewSnapshot,
     alerts: [],
     logs: [],
+    energySummary: simulatedEnergySummary,
   });
   return liveDataReducer(loaded, {
     type: 'SERVER_READY',
@@ -63,9 +65,11 @@ describe('liveDataReducer', () => {
       snapshot: overviewSnapshot,
       alerts: [],
       logs: [],
+      energySummary: simulatedEnergySummary,
     });
     expect(state.snapshot).toBe(overviewSnapshot);
     expect(state.snapshotHistory).toHaveLength(1);
+    expect(state.energySummary).toEqual(simulatedEnergySummary);
   });
 
   it('records SERVER_READY transport and backend state', () => {
@@ -107,6 +111,44 @@ describe('liveDataReducer', () => {
     });
     expect(next.snapshot?.lamps[0]?.brightnessPercent).toBe(77);
     expect(next.latestSequence).toBe(2);
+  });
+
+  it('replaces the energy summary from the existing realtime stream', () => {
+    const state = readyState();
+    const payload = {
+      ...simulatedEnergySummary,
+      calculatedAt: occurredAt,
+      sessionStartedAt: '2026-06-15T20:31:00.000Z',
+      sessionDurationSeconds: 0,
+    };
+    const next = liveDataReducer(state, {
+      type: 'DOMAIN_EVENT',
+      event: domainEvent(2, { eventType: 'ENERGY_ANALYTICS_UPDATED', payload }),
+    });
+    expect(next.energySummary?.sessionStartedAt).toBe('2026-06-15T20:31:00.000Z');
+    expect(next.latestSequence).toBe(2);
+  });
+
+  it('accepts a backend restart as a new session replacement', () => {
+    const state = readyState();
+    const payload = {
+      ...simulatedEnergySummary,
+      calculatedAt: '2026-06-15T21:00:00.000Z',
+      sessionStartedAt: '2026-06-15T21:00:00.000Z',
+      sessionDurationSeconds: 0,
+      actualSessionEnergyWh: 0,
+      referenceSessionEnergyWh: 0,
+      savedSessionEnergyWh: 0,
+      sessionSavingsPercent: 0,
+    };
+    const next = liveDataReducer(state, {
+      type: 'DOMAIN_EVENT',
+      event: domainEvent(3, { eventType: 'ENERGY_ANALYTICS_UPDATED', payload }),
+    });
+    expect(next.energySummary).toMatchObject({
+      sessionStartedAt: '2026-06-15T21:00:00.000Z',
+      actualSessionEnergyWh: 0,
+    });
   });
 
   it('replaces a sensor', () => {

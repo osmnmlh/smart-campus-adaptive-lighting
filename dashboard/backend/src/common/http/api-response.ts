@@ -2,8 +2,8 @@ import type { DataSource } from '@smart-campus/contracts';
 
 export interface ApiMeta {
   asOf: string;
-  dataSource: Extract<DataSource, 'SIMULATED'>;
-  deterministic: true;
+  dataSource: DataSource;
+  deterministic: boolean;
 }
 
 export interface ListApiMeta extends ApiMeta {
