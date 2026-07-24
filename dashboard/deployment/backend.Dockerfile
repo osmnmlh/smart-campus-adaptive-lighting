@@ -9,7 +9,6 @@ RUN npm ci
 
 FROM dependencies AS builder
 
-COPY tsconfig.base.json ./
 COPY backend backend
 COPY packages/contracts packages/contracts
 RUN npm run build --workspace=@smart-campus/backend

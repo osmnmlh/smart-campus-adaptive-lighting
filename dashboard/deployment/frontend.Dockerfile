@@ -9,7 +9,6 @@ RUN npm ci
 
 FROM dependencies AS builder
 
-COPY tsconfig.base.json ./
 COPY frontend frontend
 COPY packages/contracts packages/contracts
 
