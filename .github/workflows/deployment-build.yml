@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/single-server-online-deployment-mvp
+      - fix/final-mvp-gateway-mqtts-verification
     paths:
       - dashboard/deployment/**
       - dashboard/.dockerignore
