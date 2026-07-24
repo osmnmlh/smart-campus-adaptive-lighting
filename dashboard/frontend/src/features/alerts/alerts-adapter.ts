@@ -1,4 +1,4 @@
-import { AlertSchema, DataSource } from '@smart-campus/contracts';
+import { AlertSchema, DataSource, DataSourceSchema } from '@smart-campus/contracts';
 import {
   ACTIVITY_ENTITIES,
   isKnownActivityEntity,
@@ -30,11 +30,14 @@ const metadataNullableString = (
   return typeof value === 'string' ? value : undefined;
 };
 
-export function adaptAlerts(input: readonly unknown[]): ActivityAdapterResult<AlertRecord> {
+export function adaptAlerts(
+  input: readonly unknown[],
+  options: Readonly<{ live?: boolean }> = {},
+): ActivityAdapterResult<AlertRecord> {
   const records: AlertRecord[] = [];
   const ids = new Set<string>();
 
-  for (const raw of input) {
+  for (const [recordIndex, raw] of input.entries()) {
     const parsed = AlertSchema.safeParse(raw);
     const rawId = recordIdFrom(raw);
     if (!parsed.success) {
@@ -92,17 +95,18 @@ export function adaptAlerts(input: readonly unknown[]): ActivityAdapterResult<Al
     }
 
     const metadata = alert.metadata as Readonly<Record<string, unknown>>;
-    const title = metadataString(metadata, 'title');
-    const description = metadataString(metadata, 'description');
+    const title = metadataString(metadata, 'title') ?? (options.live ? alert.message : null);
+    const description =
+      metadataString(metadata, 'description') ?? (options.live ? alert.message : null);
     const scenarioId = metadataNullableString(metadata, 'scenarioId');
     const sequence = metadata.sequence;
+    const parsedDataSource = DataSourceSchema.safeParse(metadata.dataSource);
     if (
       title === null ||
       description === null ||
-      scenarioId === undefined ||
-      typeof sequence !== 'number' ||
-      !Number.isSafeInteger(sequence) ||
-      metadata.dataSource !== DataSource.SIMULATED
+      (!options.live && scenarioId === undefined) ||
+      (!options.live && (typeof sequence !== 'number' || !Number.isSafeInteger(sequence))) ||
+      (!options.live && metadata.dataSource !== DataSource.SIMULATED)
     ) {
       return failure(
         'INVALID_RECORD',
@@ -122,9 +126,14 @@ export function adaptAlerts(input: readonly unknown[]): ActivityAdapterResult<Al
       entityId: alert.sourceEntity.entityId,
       createdAt: alert.startedAt,
       resolvedAt: alert.resolvedAt ?? null,
-      scenarioId,
-      dataSource: DataSource.SIMULATED,
-      sequence,
+      scenarioId: scenarioId ?? null,
+      dataSource: parsedDataSource.success
+        ? parsedDataSource.data
+        : options.live
+          ? DataSource.MEASURED
+          : DataSource.SIMULATED,
+      sequence:
+        typeof sequence === 'number' && Number.isSafeInteger(sequence) ? sequence : recordIndex,
       probableCause: alert.probableCause,
       recommendedAction: alert.recommendedAction,
     });

@@ -11,9 +11,10 @@ import { applyTopologySelection, topologyDetail } from '@/features/topology/topo
 
 type TopologyDashboardProps = Readonly<{
   initialGraph: TopologyGraphModel;
+  live?: boolean;
 }>;
 
-export function TopologyDashboard({ initialGraph }: TopologyDashboardProps) {
+export function TopologyDashboard({ initialGraph, live = false }: TopologyDashboardProps) {
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
   const graph = useMemo(
     () => applyTopologySelection(initialGraph, selectedEntityId),
@@ -34,7 +35,10 @@ export function TopologyDashboard({ initialGraph }: TopologyDashboardProps) {
           </p>
         </div>
         <div className="topology-header-meta">
-          <StatusBadge label="Simulated Data" tone="neutral" />
+          <StatusBadge
+            label={live ? 'Backend Data' : 'Simulated Data'}
+            tone={live ? 'ready' : 'neutral'}
+          />
           <span>
             Snapshot: <time dateTime={graph.snapshotAt}>{graph.snapshotAtLabel}</time>
           </span>

@@ -1,12 +1,13 @@
 export function AlertsEmptyState({
   fixtureEmpty,
   onClear,
-}: Readonly<{ fixtureEmpty: boolean; onClear: () => void }>) {
+  live = false,
+}: Readonly<{ fixtureEmpty: boolean; onClear: () => void; live?: boolean }>) {
   return (
     <div className="activity-empty">
       <h3>
         {fixtureEmpty
-          ? 'No simulated alert records are available'
+          ? `No ${live ? 'backend' : 'simulated'} alert records are available`
           : 'No alerts match the selected filters'}
       </h3>
       <p>

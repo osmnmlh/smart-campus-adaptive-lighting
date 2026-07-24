@@ -1,4 +1,4 @@
-import { DataSource, EventLogSchema } from '@smart-campus/contracts';
+import { DataSource, DataSourceSchema, EventLogSchema } from '@smart-campus/contracts';
 import {
   ACTIVITY_ENTITIES,
   isKnownActivityEntity,
@@ -18,11 +18,24 @@ const recordIdFrom = (value: unknown): string | null => {
   return typeof value.id === 'string' ? value.id : null;
 };
 
-export function adaptLogs(input: readonly unknown[]): ActivityAdapterResult<LogRecord> {
+function categoryFor(eventType: string, entityType: string): LogRecord['category'] {
+  if (eventType.includes('ALERT')) return 'ALERT';
+  if (eventType.includes('SCENARIO')) return 'SCENARIO';
+  if (eventType.includes('DIRECTION')) return 'DIRECTION';
+  if (entityType === 'LAMP') return 'LAMP';
+  if (entityType === 'SENSOR') return 'SENSOR';
+  if (entityType === 'NODE') return 'NODE';
+  return 'SYSTEM';
+}
+
+export function adaptLogs(
+  input: readonly unknown[],
+  options: Readonly<{ live?: boolean }> = {},
+): ActivityAdapterResult<LogRecord> {
   const records: LogRecord[] = [];
   const ids = new Set<string>();
 
-  for (const raw of input) {
+  for (const [recordIndex, raw] of input.entries()) {
     const parsed = EventLogSchema.safeParse(raw);
     const rawId = recordIdFrom(raw);
     if (!parsed.success) {
@@ -49,7 +62,14 @@ export function adaptLogs(input: readonly unknown[]): ActivityAdapterResult<LogR
     }
 
     const metadata = event.metadata as Readonly<Record<string, unknown>>;
-    const { category, level, sequence, details, dataSource } = metadata;
+    const fallbackCategory = categoryFor(event.eventType, event.source.entityType);
+    const category = metadata.category ?? (options.live ? fallbackCategory : undefined);
+    const fallbackLevel =
+      event.severity === 'CRITICAL' ? 'ERROR' : event.severity === 'WARNING' ? 'WARNING' : 'INFO';
+    const level = metadata.level ?? (options.live ? fallbackLevel : undefined);
+    const sequence = metadata.sequence;
+    const details = metadata.details ?? (options.live ? event.message : undefined);
+    const parsedDataSource = DataSourceSchema.safeParse(metadata.dataSource);
     if (typeof category !== 'string' || !(LOG_CATEGORIES as readonly string[]).includes(category)) {
       return failure('UNKNOWN_CATEGORY', 'The simulated log category is not supported.', event.id);
     }
@@ -57,11 +77,10 @@ export function adaptLogs(input: readonly unknown[]): ActivityAdapterResult<LogR
       return failure('UNKNOWN_LEVEL', 'The simulated log level is not supported.', event.id);
     }
     if (
-      typeof sequence !== 'number' ||
-      !Number.isSafeInteger(sequence) ||
+      (!options.live && (typeof sequence !== 'number' || !Number.isSafeInteger(sequence))) ||
       typeof details !== 'string' ||
       details.trim().length === 0 ||
-      dataSource !== DataSource.SIMULATED
+      (!options.live && metadata.dataSource !== DataSource.SIMULATED)
     ) {
       return failure('INVALID_RECORD', 'Simulated log presentation metadata is invalid.', event.id);
     }
@@ -69,7 +88,8 @@ export function adaptLogs(input: readonly unknown[]): ActivityAdapterResult<LogR
     records.push({
       id: event.id,
       timestamp: event.timestamp,
-      sequence,
+      sequence:
+        typeof sequence === 'number' && Number.isSafeInteger(sequence) ? sequence : recordIndex,
       category: category as LogRecord['category'],
       level: level as LogRecord['level'],
       eventType: event.eventType,
@@ -78,7 +98,11 @@ export function adaptLogs(input: readonly unknown[]): ActivityAdapterResult<LogR
       scenarioId: event.scenarioRunId ?? null,
       summary: event.message,
       details,
-      dataSource: DataSource.SIMULATED,
+      dataSource: parsedDataSource.success
+        ? parsedDataSource.data
+        : options.live
+          ? DataSource.MEASURED
+          : DataSource.SIMULATED,
     });
   }
 

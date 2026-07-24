@@ -21,23 +21,34 @@ import {
 
 export function LogsDashboard({
   rawLogs = activityFixture.logs,
-}: Readonly<{ rawLogs?: readonly unknown[] }>) {
-  const result = adaptLogs(rawLogs);
+  live = false,
+  windowEnd = activityFixture.windowEnd,
+  transportError = null,
+}: Readonly<{
+  rawLogs?: readonly unknown[];
+  live?: boolean;
+  windowEnd?: string | null;
+  transportError?: string | null;
+}>) {
+  const result = adaptLogs(rawLogs, { live });
   const [filters, setFilters] = useState<LogFilters>(DEFAULT_LOG_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterError, setFilterError] = useState<string | null>(null);
 
-  if (!result.ok) {
+  if (transportError !== null || !result.ok) {
     return (
       <div className="activity-dashboard">
-        <LogsHeader />
-        <LogsErrorState message={result.error.message} />
+        <LogsHeader live={live} />
+        <LogsErrorState
+          message={transportError ?? (!result.ok ? result.error.message : '')}
+          live={live}
+        />
       </div>
     );
   }
 
   const entities = getAvailableLogEntities(result.records);
-  const filtered = applyLogFilters(result.records, filters, activityFixture.windowEnd);
+  const filtered = applyLogFilters(result.records, filters, windowEnd ?? new Date().toISOString());
   const selected = selectedId === null ? null : getLogById(result.records, selectedId);
   const updateFilter = (field: keyof LogFilters, value: unknown) => {
     const parsed = parseLogFilters({ ...filters, [field]: value }, entities);
@@ -55,7 +66,7 @@ export function LogsDashboard({
 
   return (
     <div className="activity-dashboard">
-      <LogsHeader />
+      <LogsHeader live={live} />
       <LogsSummary summary={getLogSummary(result.records)} />
       <LogsFilters
         filters={filters}
@@ -81,7 +92,11 @@ export function LogsDashboard({
         <div className="activity-workspace">
           <div>
             {filtered.length === 0 ? (
-              <LogsEmptyState fixtureEmpty={result.records.length === 0} onClear={clearFilters} />
+              <LogsEmptyState
+                fixtureEmpty={result.records.length === 0}
+                onClear={clearFilters}
+                live={live}
+              />
             ) : (
               <LogsTable records={filtered} selectedId={selectedId} onSelect={setSelectedId} />
             )}

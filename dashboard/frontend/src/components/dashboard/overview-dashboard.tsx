@@ -12,9 +12,14 @@ import type { OverviewModel } from '@/features/overview/overview-model';
 type OverviewDashboardProps = Readonly<{
   model: OverviewModel | null;
   errorMessage?: string | null;
+  live?: boolean;
 }>;
 
-export function OverviewDashboard({ model, errorMessage = null }: OverviewDashboardProps) {
+export function OverviewDashboard({
+  model,
+  errorMessage = null,
+  live = false,
+}: OverviewDashboardProps) {
   if (errorMessage) {
     return <OverviewEmptyState variant="error" message={errorMessage} />;
   }
@@ -26,7 +31,7 @@ export function OverviewDashboard({ model, errorMessage = null }: OverviewDashbo
   return (
     <div className="overview-dashboard">
       <OverviewHeader model={model} />
-      <DataSourceNotice model={model} />
+      <DataSourceNotice model={model} live={live} />
       <SummaryGrid model={model} />
       <div className="overview-primary-grid">
         <LampBrightnessSummary lamps={model.lamps} dataSource={model.dataSource} />

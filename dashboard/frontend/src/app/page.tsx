@@ -1,9 +1,16 @@
+'use client';
+
 import { OverviewDashboard } from '@/components/dashboard/overview-dashboard';
 import { createOverviewModel } from '@/features/overview/overview-adapter';
-import { overviewSnapshot } from '@/features/overview/overview-fixture';
-
-const overviewModel = createOverviewModel(overviewSnapshot);
+import { useDashboardData } from '@/features/live-data/dashboard-data-provider';
 
 export default function HomePage() {
-  return <OverviewDashboard model={overviewModel} />;
+  const state = useDashboardData();
+  return (
+    <OverviewDashboard
+      model={state.snapshot === null ? null : createOverviewModel(state.snapshot)}
+      errorMessage={state.snapshot === null ? state.errorMessage : null}
+      live={state.configuredMode === 'live'}
+    />
+  );
 }
