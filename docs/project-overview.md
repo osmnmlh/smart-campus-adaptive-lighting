@@ -1,193 +1,65 @@
-# Proje Genel Bakış
-
-## Proje Adı
-
-**IoT Tabanlı Adaptif Akıllı Kampüs Aydınlatma ve Arıza Tespit Sistemi**
-
-İngilizce proje adı:
-
-**IoT-Based Adaptive Smart Campus Lighting and Fault Detection System**
+# 📋 Proje Genel Teknik Şartnamesi & Kapsam
+### IoT Tabanlı Adaptif Akıllı Kampüs Aydınlatma ve Arıza Tespit Sistemi
+*(IoT-Based Adaptive Smart Campus Lighting and Fault Detection System)*
 
 ---
 
-## Projenin Amacı
+## 1. Projenin Amacı ve Çözülen Problem
 
-Bu projenin amacı; dış ortam aydınlatmasını çevresel koşullara ve hareket yoğunluğuna göre otomatik olarak ayarlayan, komşu aydınlatma düğümleriyle haberleşebilen ve temel arıza durumlarını izleyebilen bir IoT prototipi geliştirmektir.
+Geleneksel açık alan aydınlatma sistemleri (sokak, otopark, kampüs yolları) genellikle gece boyunca sabit parlaklıkta çalışır. Bu durum:
+- Ciddi oranda gereksiz enerji tüketimine,
+- Işık kirliliğine ve yüksek karbon ayak izine,
+- Erken lamba yıpranmasına ve yüksek bakım maliyetlerine yol açar.
 
-Sistem, yalnızca hareket algılandığında tepki veren klasik sensörlü lambalardan farklı olarak hareketin yönünü de değerlendirmeyi hedeflemektedir.
+Ayrıca klasik PIR sensörlü aydınlatmalar yalnızca sensörün tam altına girildiğinde lambayı aniden yakar; kullanıcının hareket yönünü kestiremediği için önündeki yol karanlık kalır ve güvenlik riskleri doğurur.
 
-Bir aydınlatma düğümü hareketi algıladığında, hareket yönündeki bir sonraki düğüme bilgi gönderir. Böylece kişi, bisikletli veya araç bir sonraki bölgeye ulaşmadan önce ilgili ışık seviyesi artırılır.
-
----
-
-## Çözülmek İstenen Problem
-
-Geleneksel dış ortam aydınlatma sistemleri çoğunlukla sabit parlaklıkta ve kullanım yoğunluğundan bağımsız olarak çalışmaktadır.
-
-Bu durum aşağıdaki problemlere yol açabilir:
-
-- Gereksiz enerji tüketimi
-- Yüksek işletme ve bakım maliyeti
-- Işık kirliliği
-- Kullanılmayan bölgelerin gereksiz şekilde tam parlaklıkta tutulması
-- Hareket yönünün dikkate alınmaması
-- Komşu aydınlatma noktaları arasında koordinasyon bulunmaması
-- Arızalı veya yanıt vermeyen ışık noktalarının geç fark edilmesi
-- Kullanıcının ilerleyeceği bölgenin zamanında aydınlatılamaması
+**Bu projenin amacı:**
+Kullanıcı hareketinin yönünü tespit ederek **ilerleme istikametindeki lambaları önceden devreye alan (pre-lighting)**, ortam ışığına göre gündüz/gece modları arasında yumuşak geçiş yapan, elektriksel akım/güç ölçümüyle lamba arızalarını anında tespit eden ve merkezi ağa bağımlı kalmadan otonom çalışan bir IoT aydınlatma prototipi geliştirmektir.
 
 ---
 
-## Önerilen Çözüm
+## 2. Temel Sistem Gereksinimleri
 
-Sistem, ESP32 tabanlı kablosuz aydınlatma düğümlerinden oluşacaktır.
-
-Her düğüm genel olarak şu görevleri yerine getirecektir:
-
-- Çevresindeki hareketi algılamak
-- Hareket yönünü belirlemek
-- Kontrol ettiği ışıkların parlaklığını ayarlamak
-- Komşu düğümlere hareket bilgisi göndermek
-- Gelen komutlara göre ön aydınlatma yapmak
-- Ortam ışığına göre gündüz ve gece modları arasında geçiş yapmak
-- Temel çalışma ve arıza durumlarını raporlamak
-
-Aydınlatmalar tamamen kapatılmak yerine, gece saatlerinde düşük bir güvenlik seviyesinde tutulabilecektir. Hareket algılandığında ilgili bölge ve hareket yönündeki sonraki bölge daha yüksek parlaklığa çıkarılacaktır.
+- **Dağıtık ve Otonom Karar (Edge Autonomy):** Düğümler arasındaki yön bilgisi alışverişi internet veya Wi-Fi erişim noktası olmasa bile doğrudan **ESP-NOW** protokolü ile gerçekleşmelidir.
+- **Yumuşak Parlaklık Geçişi (Soft PWM Dimming):** Lambalar aniden açılıp kapanmak yerine kademeli ve gözü yormayan yumuşak PWM geçişleri (fading) yapmalıdır.
+- **Arıza Tespiti & Güç Analitiği:** Fiziksel bir akım sensörü (INA219) ile çekilen akım izlenmeli; açık devre (lamba patlaması/kopukluk) veya aşırı akım (kısa devre) durumları anında tespit edilerek bildirilmelidir.
+- **Dijital İkiz & Canlı İzleme:** Web arayüzü üzerinden kampüs topolojisi, her bir lambanın anlık PWM seviyesi ve sistem arızaları WebSocket ile gecikmesiz görüntülenebilmelidir.
 
 ---
 
-## Hedef Kullanım Alanları
+## 3. Sistem Mimarisi ve Katmanlar
 
-Proje yaklaşımı aşağıdaki alanlarda uygulanabilir:
+Sistem dört ana katmandan oluşur:
 
-- Üniversite kampüsleri
-- Şehir parkları
-- Yürüyüş ve bisiklet yolları
-- Otoparklar
-- Havaalanları
-- Tren istasyonları
-- Endüstriyel bölgeler
-- Lojistik alanları
-- Şehir içi düşük yoğunluklu yollar
-
-Mevcut MVP çalışması üniversite kampüsü senaryosu üzerinden geliştirilecektir.
-
----
-
-## MVP Kapsamı
-
-İlk prototip aşağıdaki temel yapıdan oluşacaktır:
-
-- 3 aktif ESP32 düğümü
-- 5 bağımsız ışık noktası
-- 3 yön algılama bölgesi
-- Kablosuz düğümler arası haberleşme
-- Ortam ışığına bağlı çalışma modu
-- PWM tabanlı parlaklık kontrolü
-- Hareket yönüne göre ön aydınlatma
-- Gecikmeli ve kademeli parlaklık azaltma
-- Temel arıza veya durum gösterimi
-
-MVP’nin amacı gerçek bir kampüs sistemini tam ölçekte kurmak değil, temel teknik yaklaşımın çalıştığını kanıtlayan bir demonstratör ortaya çıkarmaktır.
+1. **Saha Katmanı (Physical Edge Nodes):**
+   - 3 adet ESP32 saha düğümü (`NODE_1`, `NODE_2`, `NODE_3`)
+   - 5 adet bağımsız dimlenebilir 12V LED aydınlatma noktası (`L1` - `L5`)
+   - 5 adet yön belirleyici kızılötesi hareket sensörü (`IR1` - `IR5`)
+   - 1 adet I2C ortam ışığı sensörü (`BH1750`)
+   - 1 adet I2C DC akım ve güç ölçüm sensörü (`INA219`)
+2. **Ağ Geçidi Katmanı (Dedicated Gateway - `GW_1`):**
+   - 4. bağımsız ESP32 kartı.
+   - ESP-NOW üzerinden gelen little-endian sıkı binary paketleri çözer ve CRC-32 doğrulaması yapar.
+   - SNTP ile UTC saat bilgisi ekleyerek MQTTS ile broker'a aktarır.
+3. **Mesajlaşma ve Backend Katmanı (Broker & Application Server):**
+   - Eclipse Mosquitto MQTT Broker (QoS 1, güvenli topic yapısı)
+   - NestJS backend mimarisi (Deduplication motoru, liveness sweep, normalize domain olayları)
+4. **Sunum Katmanı (Web Dashboard & Simulation):**
+   - Next.js 15, React 19, modern CSS ile geliştirilmiş interaktif harita ve kontrol merkezi.
 
 ---
 
-## MVP Kapsamı Dışında Olanlar
+## 4. İlgili Belgeler ve Bağlantılar
 
-Aşağıdaki özellikler mevcut MVP kapsamına dahil değildir:
-
-- Gerçek kampüs veya şehir saha kurulumu
-- 220/230 V gerçek sokak lambası kontrolü
-- Endüstriyel dış ortam kabini
-- IP koruma sınıfına sahip mekanik tasarım
-- LoRaWAN veya hücresel ağ altyapısı
-- Gelişmiş merkezi yönetim platformu
-- Yapay zekâ tabanlı araç veya yaya sınıflandırması
-- Radar tabanlı hız ölçümü
-- Seri üretim ve sertifikasyon çalışmaları
-
-Bu konular gelecekteki geliştirme aşamalarında ele alınabilir.
-
----
-
-## Temel Teknik Yaklaşım
-
-Projede aşağıdaki teknolojilerin kullanılması planlanmaktadır:
-
-- **ESP32:** Ana kontrol ve haberleşme
-- **ESP-NOW:** Düğümler arası kablosuz iletişim
-- **IR sensörler:** Hareket ve yön algılama
-- **BH1750:** Ortam ışığı ölçümü
-- **MOSFET sürücü:** LED parlaklık kontrolü
-- **PWM:** Kademeli dimming
-- **INA219 veya yazılımsal simülasyon:** Temel arıza ve akım izleme
-
-Detaylı donanım bağlantıları ve pin tanımları `hardware/` klasöründe, haberleşme detayları ise ilgili teknik dokümantasyon dosyalarında tutulacaktır.
-
----
-
-## Beklenen Sonuç
-
-Proje sonunda aşağıdaki davranışların gösterilmesi hedeflenmektedir:
-
-- Işıkların bağımsız olarak dim edilebilmesi
-- Hareket yönünün belirlenebilmesi
-- Hareket bilgisinin komşu düğüme aktarılması
-- Bir sonraki ışığın kullanıcı gelmeden önce artırılması
-- Hareket sona erdiğinde ışığın kademeli olarak azaltılması
-- Duran kullanıcı veya araç durumunda ışığın açık kalması
-- Ortam ışığına göre gündüz ve gece modlarının değişmesi
-- En az bir temel arıza durumunun raporlanması
-
----
-
-## Proje Durumu
-
-**Mevcut aşama:** Proje planlama ve tek düğüm donanım doğrulama
-
-- [x] Proje konusu belirlendi
-- [x] MVP kapsamı belirlendi
-- [x] Başlangıç bileşen listesi hazırlandı
-- [x] Repository yapısı oluşturuldu
-- [ ] ESP32 temel kart testi
-- [ ] PWM LED testi
-- [ ] Ortam ışığı sensörü testi
-- [ ] Yön algılama testi
-- [ ] ESP-NOW haberleşme testi
-- [ ] Tek düğüm entegrasyonu
-- [ ] Çoklu düğüm entegrasyonu
-- [ ] Arıza izleme
-- [ ] Final sistem testi
-
----
-
-## İlgili Dokümantasyon
-
-Detaylı bilgiler aşağıdaki dosyalarda tutulacaktır:
-
-| Konu | Dosya |
+| Doküman | Açıklama |
 |---|---|
-| Sistem mimarisi | `docs/system-architecture.md` |
-| ESP-NOW mesaj yapısı | `docs/communication-protocol.md` |
-| Durum makinesi | `docs/state-machine.md` |
-| Arıza tespiti | `docs/fault-detection.md` |
-| Güç mimarisi | `docs/power-architecture.md` |
-| Test planı | `docs/test-plan.md` |
-| Riskler | `docs/risk-register.md` |
-| Günlük staj çalışmaları | `docs/internship-log/` |
-| Pin bağlantıları | `hardware/pinout/` |
-| Devre ve kablolama | `hardware/schematics/` ve `hardware/wiring-diagrams/` |
-| Satın alma listesi | `hardware/bom/` |
-| Test sonuçları | `tests/` |
+| [Ana README.md](../README.md) | Proje vitrini, ekran görüntüleri, mimari ve hızlı başlangıç |
+| [Donanım Kılavuzu](../hardware/README.md) | Pin bağlantı şemaları, malzeme listesi ve elektriksel kurallar |
+| [Firmware Dokümantasyonu](../firmware/README.md) | Gateway ve Node C++ PlatformIO derleme ve test rehberi |
+| [Mimari Kararlar (ADR)](../dashboard/docs/architecture/) | Sistem mimarisi kararları (ADR-0001 - ADR-0005) |
 
 ---
 
-## Proje Sahibi
-
-**Osman Melih Gümüş**  
-**Öğrenci Numarası:** 1030521449  
+**Proje Sahibi:** Osman Melih Gümüş  
 **Bölüm:** Bilgisayar Mühendisliği  
-**Proje Türü:** Donanım Stajı / Gömülü Sistemler ve IoT Projesi
-
----
-
-**Son Güncelleme:** 13 Temmuz 2026
+**Odak Alanı:** Gömülü Sistemler, IoT Mimarileri ve Dağıtık Ağlar
