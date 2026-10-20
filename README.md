@@ -1,6 +1,7 @@
 # 💡 IoT Tabanlı Adaptif Akıllı Kampüs Aydınlatma ve Arıza Tespit Sistemi
 ### *IoT-Based Adaptive Smart Campus Lighting & Fault Detection System*
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![ESP32](https://img.shields.io/badge/Hardware-ESP32-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](https://www.espressif.com/)
 [![ESP-NOW](https://img.shields.io/badge/Mesh_Protocol-ESP--NOW-red?style=for-the-badge)](https://www.espressif.com/en/solutions/low-power-solutions/esp-now)
 [![MQTT](https://img.shields.io/badge/Transport-MQTT_%2F_MQTTS_(TLS)-660066?style=for-the-badge&logo=eclipsemosquitto&logoColor=white)](https://mosquitto.org/)
@@ -14,30 +15,70 @@
 
 ## 📌 Proje Özeti (Executive Summary)
 
-**Smart Campus Adaptive Lighting**, geleneksel açık alan sokak ve kampüs aydınlatmalarının sebep olduğu yüksek enerji israfını, ışık kirliliğini ve kör nokta kazalarını önlemek amacıyla geliştirilmiş **uç bilişim (Edge Computing) destekli, yön tahminli ve arıza izlemeli yeni nesil bir IoT aydınlatma ekosistemidir.**
+Bu proje; açık alan kampüs, yol ve otopark aydınlatmalarında sabit parlaklıktan kaynaklanan gereksiz enerji tüketimini ve kör nokta güvenlik problemlerini çözmek amacıyla geliştirilmiş **uç bilişim (Edge Computing) destekli, yön kestirimli ve arıza izlemeli bir IoT aydınlatma prototipidir.**
 
-Sistem; 4 adet ESP32 mikrodenetleyicisi (3 otonom saha düğümü + 1 ağ geçidi), yönlü kızılötesi (IR) hareket sensörleri, ortam ışığı sensörü (BH1750), hassas elektriksel güç/akım sensörü (INA219), MOSFET PWM sürücüleri, Mosquitto MQTT broker, NestJS backend ve Next.js tabanlı gerçek zamanlı bir dijital ikiz web paneli (Dashboard) içermektedir.
+Sistem; 4 adet ESP32 mikrodenetleyicisi (3 saha kontrol düğümü + 1 ağ geçidi), yönlü kızılötesi (IR) hareket sensörleri, ortam ışığı sensörü (BH1750), elektriksel ölçüm sensörü (INA219), MOSFET PWM sürücüleri, Mosquitto MQTT broker, NestJS backend ve Next.js tabanlı gerçek zamanlı bir dijital ikiz web paneli (Dashboard) içermektedir.
 
-> **Temel Mühendislik Yaklaşımı: *"Local-first, Edge-autonomous, Cloud-ready"***  
-> İnternet bağlantısı veya merkezi sunucu çökse dahi, saha düğümleri kendi aralarında **ESP-NOW** protokolü üzerinden haberleşerek yön tahminli aydınlatmayı kesintisiz sürdürür.
+> **Temel Yaklaşım: *"Local-first, Edge-autonomous, Cloud-ready"***  
+> Düğümler yön ve hareket sinyalleşmesini internete ya da merkezi bir router'a ihtiyaç duymadan doğrudan **ESP-NOW** üzerinden yürütür. Gateway ya da bulut bağlantısı kopsa dahi saha aydınlatması kesintiye uğramaz.
 
 ---
 
 ## 🚀 Öne Çıkan Özellikler (Key Highlights)
 
-- 🧭 **Yön Kestirimli Adaptif Aydınlatma (Directional Predictive Lighting):** Hareket algılandığında yalnızca bulunulan lamba değil; hareket yönündeki bir sonraki lamba, kişi veya araç henüz oraya ulaşmadan önce kademeli olarak %60 ön aydınlatma (pre-lighting) seviyesine getirilir.
-- ⚡ **Otonom Uç Karar Mekanizması (Edge Autonomy):** Düğümler arasındaki haberleşme harici bir router ya da internete ihtiyaç duymayan 2.4 GHz **ESP-NOW** protokolü ile sağlanır (Gecikme < 10 ms).
-- 🛰️ **Özel Ağ Geçidi (Dedicated Gateway - `GW_1`):** 4. bağımsız ESP32 kartı; düğümlerden gelen sıkıştırılmış ikili (binary) paketleri doğrular (IEEE CRC-32, MAC allowlist), SNTP ile UTC zaman damgası ekler ve TLS şifreli MQTTS ile broker'a aktarır.
-- 📊 **Gerçek Zamanlı Çift Yönlü Dijital İkiz (Digital Twin Dashboard):** WebSocket (`/ws/v1`) üzerinden milisaniye düzeyinde canlı lamba parlaklıkları, canlı topoloji haritası, düğüm durumları ve anlık telemetri akışı.
+- 🧭 **Yön Kestirimli Adaptif Aydınlatma (Directional Predictive Lighting):** Hareket algılandığında yalnızca bulunulan lamba değil, hareket yönündeki bir sonraki lamba da kişi/araç henüz oraya ulaşmadan önce kademeli olarak %60 ön aydınlatma (pre-lighting) seviyesine getirilir.
+- ⚡ **Otonom Uç Karar Mekanizması (Edge Autonomy):** Düğümler arasındaki koordinasyon 2.4 GHz **ESP-NOW** protokolü ile sağlanır (Gecikme < 10 ms).
+- 🛰️ **Ayrık Ağ Geçidi (Dedicated Gateway - `GW_1`):** 4. bağımsız ESP32 kartı; düğümlerden gelen sıkıştırılmış ikili (binary) paketleri doğrular (IEEE CRC-32, MAC allowlist), SNTP ile UTC zaman damgası ekler ve TLS şifreli MQTTS ile broker'a aktarır.
+- 📊 **Çift Yönlü Dijital İkiz (Digital Twin Dashboard):** WebSocket (`/ws/v1`) üzerinden lamba parlaklıkları, saha topolojisi, düğüm durumları ve telemetri akışı izlenir.
 - 🔌 **Fiziksel Ölçüm & Analitik (Measured vs Estimated Energy):** `NODE_2` üzerindeki INA219 ile fiziksel akım/voltaj/güç tüketimi (`MEASURED`) okunur; diğer lambalar matematiksel modellerle (`ESTIMATED`) doğrulanarak sistem geneli tasarruf hesabı çıkarılır.
-- 🛡️ **Akıllı Arıza & Liveness Tespiti:** 15 saniyelik liveness kontrolü (3 kaçırılan heartbeat), hat koptuğunda otomatik `OFFLINE` alarmı, aşırı akım veya CRC hata raporlaması.
-- 🎮 **Yerleşik Senaryo & Simülasyon Motoru:** Fiziksel donanım bağlı olmasa dahi *"Yaya Yürüyüşü"*, *"Hızlı Araç Geçişi"*, *"Düğüm Arızası"* gibi senaryoları uçtan uca simüle edebilme imkanı.
+- 🛡️ **Arıza & Liveness Tespiti:** 15 saniyelik liveness kontrolü (3 kaçırılan heartbeat) ile hat koptuğunda otomatik `OFFLINE` durumu ve aşırı akım/açık devre alarmları üretilir.
+- 🎮 **Yerleşik Senaryo & Simülasyon Motoru:** Fiziksel donanım bağlı olmasa dahi *"Yaya Yürüyüşü"*, *"Hızlı Araç Geçişi"*, *"Düğüm Arızası"* gibi durumlar uçtan uca simüle edilebilir.
+
+---
+
+## 🏭 Prototip Mimarisi vs. Endüstriyel Saha Gerçekleri (Gap Analysis)
+
+Bu çalışma, laboratuvar ölçeğinde mimari yaklaşımı doğrulamak için geliştirilmiş bir **donanım prototipidir (PoC / MVP)**. Endüstriyel saha uygulamaları ile mevcut prototip arasındaki farklar ve üretim yol haritası aşağıda şeffafça özetlenmiştir:
+
+| Mimari Katman | Bu Prototipteki Yaklaşım | Endüstriyel Aydınlatma Standardı | Üretime Yönelik Öngörülen Geçiş |
+|---|---|---|---|
+| **Armatür Gerilimi** | 12V DC LED Şerit / Modül | 230V AC Şebeke Gerilimi | Şebeke gerilimi uyumlu izole endüstriyel LED sürücü (Driver) |
+| **Dimleme Arayüzü** | D4184 Logic-Level MOSFET (PWM) | **DALI-2 (IEC 62386)**, D4i veya **0-10V / 1-10V** | Mikrodenetleyici PWM çıkışı yerine izole DALI-2 transceiver (ör. MAX14827) veya 0-10V analog dönüştürücü |
+| **Mekanik Soket & Arayüz** | Breadboard / Doğrudan Kablolama | **Zhaga Book 18** veya **NEMA ANSI C136.41 (7-pin)** | Armatür üstü standart Zhaga/NEMA yuvalı tak-çıkar kontrolcü nod tasarımı |
+| **Geniş Alan İletişimi** | ESP-NOW (P2P Mesh, ~100m) | **LoRaWAN**, **NB-IoT** veya **PLC** (Power Line) | Kampüs içi ESP-NOW korunabilir; geniş coğrafi/şehir hatlarında LoRaWAN veya hücresel (NB-IoT/LTE-M) hibrit ağ geçidi |
+| **Koruma & İzolasyon** | Laboratuvar açık devre | **IP66 / IP67**, **IK08/IK10**, **10 kV SPD (Parafudr)** | Aşırı gerilim/yıldırım koruması ve dış ortam sızdırmaz döküm alüminyum gövde |
+| **Ölçüm Doğruluğu** | INA219 (I2C şönt dirençli) | Class 1 / Class 0.5 Enerji Ölçüm IC (MID uyumlu) | ANSI C136.52 / D4i enerji raporlama standartlarına uygun metroloji katmanı |
+
+> **Mühendislik Notu:** 12V DC ve MOSFET tabanlı mimari; düşük gerilim güvenliği, laboratuvar ortamında hızlı yineleme ve mantıksal doğrulama amacıyla seçilmiştir. Yazılım durum makinesi, dedup mantığı ve ağ geçidi katmanı DALI-2 veya 0-10V sürücü entegrasyonuna hazır mimaridedir.
+
+---
+
+## 💡 Aydınlatma Standartları ve Mühendislik Tercihleri
+
+Bir aydınlatma sistemi yalnızca yazılımdan ibaret değildir; fotometrik regülasyonlar ve kullanıcı konforu standartlarına uygunluk esastır:
+
+### 1. Yol Aydınlatma Sınıfları (EN 13201 Uyumu)
+Avrupa standardı **EN 13201-2**, yaya ve düşük hızlı araç yolları için aydınlatma sınıflarını (P1 - P6) belirler. 
+* Projede gece bekleme modu için seçilen **%10 - %20 bekleme seviyesi**, kullanıcı yokken enerji tasarrufu sağlarken yolda sıfır karanlık oluşturmayarak EN 13201 asgari aydınlık düzeyini (Eav) korumak üzere belirlenmiştir.
+* Hareket algılandığında sistem hedef sınıfın tam parlaklık gereksinimine (%100) çıkar; hareket sona erdiğinde ani kararma yerine 15 saniyelik tutma süresi ve 3 saniyelik kademeli geçişle bekleme seviyesine döner.
+
+### 2. PWM Frekansı ve Titreme (IEEE 1789-2015 Flicker Standardı)
+Düşük frekanslı PWM anahtarlaması insan gözünde görünür veya stroboskopik titremeye (flicker), baş ağrısına ve kamera kayıtlarında parazite sebep olur.
+* Sistemde ESP32 LEDC PWM donanım frekansı **5 kHz** olarak ayarlanmıştır.
+* Bu değer, **IEEE 1789-2015** ("Recommended Practices for Modulating Current in LEDs") standardında tanımlanan *"Flicker - No Observable Effect"* (Gözlemlenebilir Etki Yok) sınırları içerisinde kalmayı sağlar.
+
+### 3. Zemin Lüksü vs. Ortam Işığı Ölçümü
+* Prototipte `NODE_2` üzerine entegre edilen **BH1750**, armatür seviyesindeki ortam ışığını (Gündüz/Gece geçişi için) ölçer.
+* Gerçek saha aydınlatma projelerinde zemin aydınlık seviyesi fotometrik dağılım eğrileri (IES/LDT), direk yüksekliği, montaj açısı ve zemin yansıtma katsayısına göre hesaplanır (Dialux vb.). Sistem mimarisinde bu hesaplama eşik değerleri parametrik olarak yapılandırılabilir tutulmuştur.
+
+### 4. Elektromanyetik Uyumluluk (EMC)
+Yüksek frekanslı anahtarlama devrelerinin endüstriyel ortamlarda **EN 55015** (Radyo parazit sınırları) ve **EN 61547** (Bağışıklık) standartlarını karşılaması gerekir. Prototip devrelerinde LC filtreleme ve dekuplaj kondansatörleri kullanılmıştır.
 
 ---
 
 ## 🖥️ Arayüz ve Dashboard Önizlemesi (Web Interface)
 
-Sistem; modern, koyu temalı (dark mode), mikro animasyonlara sahip ve operasyonel kararları kolaylaştıran Next.js tabanlı bir yönetim paneline sahiptir:
+Sistem; koyu temalı, mikro animasyonlara sahip ve operasyonel kararları kolaylaştıran Next.js tabanlı bir yönetim paneline sahiptir:
 
 ### 1. Genel Bakış ve Metrikler (Overview Dashboard)
 *Gerçek zamanlı enerji tasarrufu yüzdesi, anlık çekilen güç (W), aktif düğüm/lamba sayıları ve son sistem telemetrileri:*
@@ -63,7 +104,7 @@ Sistem; modern, koyu temalı (dark mode), mikro animasyonlara sahip ve operasyon
 
 ## 🛠️ Donanım ve Prototip Mimarisi (Hardware Prototype)
 
-Sistem prototipi laboratuvar ortamında gerçek donanım bileşenleriyle kurulmuş ve doğrulanmıştır:
+Sistem prototipi laboratuvar ortamında kurulan donanım bileşenleriyle test edilmiştir:
 
 | Çalışma Masası Test Düzeneği | ESP32 Düğüm Ağı & Kablolama |
 |:---:|:---:|
@@ -98,7 +139,7 @@ flowchart TD
     end
 
     subgraph GATEWAY_TIER["3. Ağ Geçidi (Gateway Tier)"]
-        GW["GW_1 (4. Bağımsız ESP32)<br/>• Sıkı Binary Protokol Çözücü<br/>• IEEE CRC-32 Doğrulama<br/>• SNTP UTC Zaman Damgası<br/>• Bounded Outbox Kuyruğu"]
+        GW["GW_1 (4. Bağımsız ESP32)<br/>• Binary Protokol Çözücü<br/>• IEEE CRC-32 Doğrulama<br/>• SNTP UTC Zaman Damgası<br/>• Bounded Outbox Kuyruğu"]
     end
 
     subgraph BROKER_TIER["4. Mesaj Dağıtım (Broker)"]
@@ -117,7 +158,7 @@ flowchart TD
     end
 
     SENSOR_TIER --> NODE_TIER
-    NODE_TIER -->|"ESP-NOW Compact Binary Wire Frames<br/>(28-40 Bytes, CRC-32)"| GW
+    NODE_TIER -->|"ESP-NOW Binary Wire Frames<br/>(28-40 Bytes, CRC-32)"| GW
     GW -->|"MQTTS (JSON Schema v1)"| MQTT
     MQTT --> INGEST
     INGEST --> ENGINE
@@ -156,79 +197,78 @@ Sistemdeki lambalar aşağıdaki durum geçişlerine göre yönetilir:
 | Teknoloji / Araç | Sürüm / Detay | Kullanım Amacı |
 |---|---|---|
 | **ESP32 DevKit V1** | Xtensa Dual-Core | Otonom düğüm kontrolü ve kablosuz haberleşme |
-| **PlatformIO Core** | `6.1.19` | Modüler C++17 firmware geliştirme, derleme ve CI ortamı |
+| **PlatformIO Core** | `6.1.19` | Modüler C++17 firmware geliştirme, derleme ve test ortamı |
 | **ESP-IDF / Arduino** | `espressif32@7.0.1` | Donanım sürücüleri, PWM (LEDC), I2C ve Wi-Fi yığını |
-| **ESP-NOW** | 2.4 GHz Proprietary | Düğümler arası router'sız ultra hızlı (<10ms) haberleşme |
-| **Unity Test Framework** | C++ Native | Gateway ve node çekirdek mantığı için donanımsız native birim testleri |
+| **ESP-NOW** | 2.4 GHz Proprietary | Düğümler arası router'sız düşük gecikmeli (<10ms) haberleşme |
+| **Unity Test Framework** | C++ Native | Gateway ve node mantığı için donanımsız native birim testleri |
 | **Sensörler** | BH1750, INA219, IR | Ortam ışığı, elektriksel güç ölçümü ve yönlü hareket algılama |
 
 ### 2. Sunucu ve Veri Hattı (Backend & Ingestion)
 | Teknoloji / Araç | Sürüm / Detay | Kullanım Amacı |
 |---|---|---|
-| **NestJS** | v11 | Kurumsal düzeyde ölçeklenebilir backend mimarisi |
-| **Eclipse Mosquitto** | v2.0 (Docker) | Hafif, yüksek performanslı MQTT broker (QoS 1) |
-| **Native WebSocket** | RFC 6455 (`/ws/v1`) | Dashboard için sıfır gecikmeli gerçek zamanlı çift yönlü veri akışı |
+| **NestJS** | v11 | Modüler backend mimarisi |
+| **Eclipse Mosquitto** | v2.0 (Docker) | MQTT broker (QoS 1) |
+| **Native WebSocket** | RFC 6455 (`/ws/v1`) | Dashboard için gerçek zamanlı veri akışı |
 | **Node.js** | v22.x LTS | Backend çalışma zamanı ortamı |
 | **TypeScript** | v5.7+ | Uçtan uca tip güvenliği ve paylaşımlı sözleşmeler (`@smart-campus/contracts`) |
 
 ### 3. Kullanıcı Deneyimi ve Arayüz (Frontend & UI)
 | Teknoloji / Araç | Sürüm / Detay | Kullanım Amacı |
 |---|---|---|
-| **Next.js** | 15 (App Router) | Yüksek performanslı React web uygulaması |
-| **React** | 19 | Bileşen tabanlı reaktif durum yönetimi |
-| **Modern Vanilla CSS & Tailwind** | Modern Dark UI | Glassmorphism, akıcı geçiş animasyonları ve responsive yerleşim |
-| **Lucide Icons** | SVG İkon Seti | Modern ve anlaşılır sistem ikonografisi |
+| **Next.js** | 15 (App Router) | React tabanlı web uygulaması |
+| **React** | 19 | Bileşen tabanlı durum yönetimi |
+| **Modern CSS** | Modern Dark UI | Akıcı geçiş animasyonları ve responsive yerleşim |
+| **Lucide Icons** | SVG İkon Seti | Sistem ikonografisi |
 
 ---
 
 ## 📁 Repository Dosya Yapısı (Clean Structure)
-
-Gereksiz dosyalar temizlenmiş, anlaşılır ve modüler dosya yapısı:
 
 ```text
 smart-campus-adaptive-lighting/
 ├── assets/                          # Görsel varlıklar ve ekran görüntüleri
 │   ├── dashboard/                   # Web arayüzü ekran görüntüleri (5 adet)
 │   └── hardware/                    # Donanım prototipi ve laboratuvar fotoğrafları (4 adet)
-├── dashboard/                       # Tam teşekküllü web yönetim paneli & backend
+├── dashboard/                       # Web yönetim paneli & backend
 │   ├── backend/                     # NestJS backend servisi (MQTT alıcı, WS sunucusu, REST)
 │   ├── frontend/                    # Next.js 15 web arayüzü (Topoloji, Metrikler, Simülatör)
-│   ├── packages/contracts/          # Backend, Frontend ve Firmware ortak TypeScript sözleşmeleri
+│   ├── packages/contracts/          # Ortak TypeScript sözleşmeleri
 │   ├── infrastructure/              # Mosquitto MQTT Docker Compose yapılandırması
-│   ├── deployment/                  # Canlıya alma (production) scriptleri ve compose dosyaları
-│   └── docs/                        # Detaylı mimari karar kayıtları (ADR'ler) ve entegrasyon dokümanları
+│   ├── deployment/                  # Production compose ve doğrulama scriptleri
+│   └── docs/                        # Mimari karar kayıtları (ADR'ler) ve entegrasyon dokümanları
 ├── docs/                            # Proje teknik dokümantasyonu
-│   └── project-overview.md          # Proje genel teknik şartnamesi ve detaylı kapsamı
+│   └── project-overview.md          # Proje teknik şartnamesi ve mimari kapsamı
 ├── firmware/                        # ESP32 C++17 gömülü yazılımları
 │   ├── gateway/                     # GW_1 Ağ Geçidi firmware kodu (ESP-NOW -> MQTTS köprüsü)
 │   ├── node/                        # NODE_1, NODE_2, NODE_3 ortak firmware kodu (PlatformIO profilli)
 │   ├── shared/                      # İkili (binary) protokol kodlayıcı ve IEEE CRC-32 kütüphanesi
 │   ├── integration/                 # Donanım doğrulama kontrol listeleri ve bağlantı örnekleri
-│   └── test-vectors/                # Firmware ve backend arasındaki sözleşme doğrulama JSON vektörleri
+│   └── test-vectors/                # Sözleşme doğrulama JSON test vektörleri
 ├── hardware/                        # Donanım pinout kılavuzu ve elektriksel güvenlik rehberi
 │   └── README.md                    # Pin haritaları, BOM listesi ve donanım açıklamaları
 ├── presentation/                    # Sunum dosyaları ve ESP32 eğitim slaytları
 │   ├── ESP32_Gomulu_Sistemlere_Giris.pptx
 │   └── ESP32__Rehber_SSS.pdf
+├── LICENSE                          # MIT Lisansı
 ├── .gitignore                       # Git yoksayma kuralları
-└── README.md                        # Ana proje tanıtım ve vitrin dokümanı (Bu dosya)
+└── README.md                        # Ana proje tanıtım ve mimari dokümanı
 ```
 
 ---
 
-## 🔬 Mühendislik Kararları ve Teknik Detaylar (Engineering Highlights)
+## 🔬 Mühendislik Detayları (Engineering Decisions)
 
 1. **Paket Boyutu & Wire Budget:**  
-   ESP-NOW paket boyutu hedefi maksimum 220 bayttır. JSON formatı 275 baytı aştığı için, firmware katmanında little-endian ikili (binary) bir protokol geliştirilmiştir:
+   ESP-NOW paket boyutu hedefi maksimum 220 bayttır. JSON formatı 275 baytı aştığı için, firmware katmanında little-endian ikili (binary) bir protokol kullanılmıştır:
    - Kalp Atışı (Heartbeat): **28 bayt**
    - Lamba Durumu (Lamp State): **30 bayt**
    - Sensör Olayı (Sensor Event): **31 bayt**
-   - Elektriksel Ölçüm (Electrical): **40 bayt**
-   Tüm paketler donanım düzeyinde 4 baytlık **IEEE CRC-32** ile korunur.
-2. **Kusursuz Tekilleştirme (Deduplication):**  
-   Paket kayıplarını ve kablosuz tekrarları önlemek için ESP32'nin kalıcı NVS hafızasında saklanan `BOOT_XXXXXXXX` sayaçları kullanılır. Her mesaj benzersiz `nodeId:bootId:sequence` anahtarına sahiptir. Backend mükerrer paketleri veritabanına ya da arayüze iletmeden eler.
+   - Elektriksel Ölçüm (Electrical): **40 bayt**  
+   Tüm paketler donanım düzeyinde 4 baytlık **IEEE CRC-32** ile doğrulanır.
+2. **Dedup (Tekilleştirme) Mekanizması:**  
+   Kablosuz tekrarları ve ağ yankılarını filtrelemek için ESP32'nin kalıcı NVS hafızasında saklanan `BOOT_XXXXXXXX` sayaçları kullanılır. Her mesaj `nodeId:bootId:sequence` anahtarına sahiptir. Backend mükerrer paketleri veritabanına ya da arayüze iletmeden eler.
 3. **Fail-Safe Mekanizması:**  
-   Gateway bağlantısı kopsa dahi lamba kontrolü kesilmez. Node sensör arızası yaşarsa (ör. IR sensör sürekli HIGH kalırsa), güvenlik zaman aşımı (15 saniye) devreye girerek lambanın sonsuza kadar açık kalmasını engeller.
+   Gateway bağlantısı kopsa dahi lamba kontrolü kesilmez. Node sensör arızası yaşarsa (ör. IR sensör sürekli HIGH kalırsa), güvenlik zaman aşımı (15 saniye) devreye girerek lambanın sürekli açık kalmasını engeller.
 4. **PlatformIO Çoklu Profil Mimarisi:**  
    Tek bir kod tabanından derleme bayrakları (`-D SMART_CAMPUS_NODE_ID=1/2/3`) ile 3 farklı düğümün ve ağ geçidinin yazılımı tek komutla üretilebilir.
 
@@ -262,7 +302,7 @@ npm run build
 npm run dev
 ```
 
-Tarayıcınızda `http://localhost:3000` adresine giderek **Topoloji, Senaryolar, Arıza Uyarıları ve Logları** canlı olarak deneyimleyebilirsiniz!
+Tarayıcınızda `http://localhost:3000` adresine giderek **Topoloji, Senaryolar, Arıza Uyarıları ve Logları** canlı olarak deneyimleyebilirsiniz.
 
 ### 2. Firmware Birim Testlerini Çalıştırma (Native C++)
 
@@ -276,15 +316,15 @@ pio test -d node -e native
 
 ---
 
+## 📄 Lisans
+
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
+
+---
+
 ## 👨‍💻 Proje Geliştiricisi
 
 **Osman Melih Gümüş**  
 *Bilgisayar Mühendisliği Öğrencisi & Gömülü Sistem / IoT Geliştirici*  
 - **GitHub:** [@osmnmlh](https://github.com/osmnmlh)  
-- **Proje Konusu:** IoT Tabanlı Adaptif Akıllı Kampüs Aydınlatma ve Arıza Tespit Sistemi
-
----
-
-<p align="center">
-  <i>Bu proje; düşük güç tüketimli uç bilişim, dağıtık kablosuz ağlar (ESP-NOW), güvenilir IoT mesajlaşması (MQTT) ve modern reaktif web teknolojilerini bir araya getiren uçtan uca eksiksiz bir mühendislik çalışmasıdır.</i>
-</p>
+- **Proje:** IoT Tabanlı Adaptif Akıllı Kampüs Aydınlatma ve Arıza Tespit Sistemi
